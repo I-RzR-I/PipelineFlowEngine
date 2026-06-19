@@ -16,14 +16,14 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.CommonExtensions.TypeParam;
 using Microsoft.Extensions.Logging;
-using PipelineFlowEngine.Abstractions;
-using PipelineFlowEngine.Enums;
-using PipelineFlowEngine.Extensions;
-using PipelineFlowEngine.Models.Result;
-using PipelineFlowEngine.Pipeline;
 using PipelineInvokeTest.Models;
+using RzR.Extensions.Domain.Reflection.TypeParam;
+using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Extensions;
+using RzR.PipelineFlowEngine.Models.Result;
+using RzR.PipelineFlowEngine.Pipeline;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,7 +76,7 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
                     .SetFlowEvent(LogLevel.Error, e.Message, e)
                     .SetState(PipelineStateType.Finish)
                     .SetStatus(PipelineStatusType.Fail)
-                    .AsPipelineStepResult();
+                    .AsPipelineStepResult<PersonDto>();
             }
         }
     }

@@ -16,23 +16,21 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.ArraysExtensions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 // ReSharper disable CheckNamespace
 
 #endregion
 
-namespace PipelineFlowEngine.Models.Result
+namespace RzR.PipelineFlowEngine.Models.Result
 {
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     ///     Encapsulates the result events of a flow.
     /// </content>
-    /// <seealso cref="PipelineFlowEngine.Models.Result.FlowResult{T}"/>
+    /// <seealso cref="RzR.PipelineFlowEngine.Models.Result.FlowResult{T}"/>
     /// =================================================================================================
     public abstract partial class FlowResult<T> where T : class
     {
@@ -47,7 +45,7 @@ namespace PipelineFlowEngine.Models.Result
         /// =================================================================================================
         public FlowResult<T> SetFlowEvent(PipelineFlowEvent @event)
         {
-            Events = Events.Append(@event);
+            _events.Add(@event);
 
             return this;
         }
@@ -63,7 +61,7 @@ namespace PipelineFlowEngine.Models.Result
         /// =================================================================================================
         public FlowResult<T> SetFlowEvent(IEnumerable<PipelineFlowEvent> events)
         {
-            Events = Events.ToArray().AppendItem(events.ToArray());
+            _events.AddRange(events);
 
             return this;
         }
@@ -81,7 +79,7 @@ namespace PipelineFlowEngine.Models.Result
         /// =================================================================================================
         public FlowResult<T> SetFlowEvent(LogLevel level, string flowName, string message)
         {
-            Events = Events.Append(new PipelineFlowEvent(level, flowName, message));
+            _events.Add(new PipelineFlowEvent(level, flowName, message));
 
             return this;
         }
@@ -100,7 +98,7 @@ namespace PipelineFlowEngine.Models.Result
         /// =================================================================================================
         public FlowResult<T> SetFlowEvent(LogLevel level, string flowName, string message, Exception exception)
         {
-            Events = Events.Append(new PipelineFlowEvent(level, flowName, message, exception));
+            _events.Add(new PipelineFlowEvent(level, flowName, message, exception));
 
             return this;
         }
@@ -118,7 +116,7 @@ namespace PipelineFlowEngine.Models.Result
         /// =================================================================================================
         public FlowResult<T> SetFlowEvent(LogLevel level, string flowName, Exception exception)
         {
-            Events = Events.Append(new PipelineFlowEvent(level, flowName, exception.Message, exception));
+            _events.Add(new PipelineFlowEvent(level, flowName, exception.Message, exception));
 
             return this;
         }

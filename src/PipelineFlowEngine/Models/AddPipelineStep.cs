@@ -16,8 +16,8 @@
 
 #region U S A G E S
 
-using PipelineFlowEngine.Abstractions;
-using PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Enums;
 
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable UnusedMember.Global
@@ -25,7 +25,7 @@ using PipelineFlowEngine.Enums;
 
 #endregion
 
-namespace PipelineFlowEngine.Models
+namespace RzR.PipelineFlowEngine.Models
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

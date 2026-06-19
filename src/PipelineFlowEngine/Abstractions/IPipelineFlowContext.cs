@@ -16,11 +16,11 @@
 
 #region U S A G E S
 
-using PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Enums;
 
 #endregion
 
-namespace PipelineFlowEngine.Abstractions
+namespace RzR.PipelineFlowEngine.Abstractions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

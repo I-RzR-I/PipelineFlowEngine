@@ -16,14 +16,14 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.DataTypeExtensions;
 using Microsoft.Extensions.Logging;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Extensions.Domain.Validation;
 using System;
 
 #endregion
 
-namespace PipelineFlowEngine.Extensions
+namespace RzR.PipelineFlowEngine.Extensions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

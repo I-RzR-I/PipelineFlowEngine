@@ -16,12 +16,12 @@
 
 #region U S A G E S
 
-using PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Enums;
 using System.Collections.Generic;
 
 #endregion
 
-namespace PipelineFlowEngine.Models.Result
+namespace RzR.PipelineFlowEngine.Models.Result
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -33,6 +33,13 @@ namespace PipelineFlowEngine.Models.Result
     /// =================================================================================================
     public abstract partial class FlowResult<T> where T : class
     {
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     (Immutable) the events.
+        /// </summary>
+        /// =================================================================================================
+        private readonly List<PipelineFlowEvent> _events = new List<PipelineFlowEvent>();
+
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the flow response.
@@ -91,7 +98,6 @@ namespace PipelineFlowEngine.Models.Result
         ///     The events.
         /// </value>
         /// =================================================================================================
-        public IEnumerable<PipelineFlowEvent> Events { get; private set; }
-            = new List<PipelineFlowEvent>();
+        public IEnumerable<PipelineFlowEvent> Events => _events;
     }
 }

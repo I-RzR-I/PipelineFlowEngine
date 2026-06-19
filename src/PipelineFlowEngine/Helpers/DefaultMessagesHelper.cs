@@ -14,7 +14,7 @@
 //  </summary>
 // ***********************************************************************
 
-namespace PipelineFlowEngine.Helpers
+namespace RzR.PipelineFlowEngine.Helpers
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -62,6 +62,8 @@ namespace PipelineFlowEngine.Helpers
             internal const string ExecPipelineFinished = "Pipeline finished work";
             internal const string PreValidationExecutionStep = "Pre-execution validation failed, break out from the pipeline step";
             internal const string PreValidationExecutionStepResult = "Pre-execution validation was finished with status ['{0}']";
+            internal const string ScheduledStepXDispatched = "Scheduled step ['{0}'] dispatched (fire-and-forget); result is not awaited.";
+            internal const string ScheduledStepXDispatchFaulted = "Scheduled step ['{0}'] dispatched (fire-and-forget) faulted in the background.";
         }
     }
 }

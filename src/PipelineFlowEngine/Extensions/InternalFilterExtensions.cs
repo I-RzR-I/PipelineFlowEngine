@@ -16,14 +16,14 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.DataTypeExtensions;
-using PipelineFlowEngine.Abstractions;
+using RzR.Extensions.Domain.Primitives;
+using RzR.PipelineFlowEngine.Abstractions;
 using System.Collections.Generic;
 using System.Linq;
 
 #endregion
 
-namespace PipelineFlowEngine.Extensions
+namespace RzR.PipelineFlowEngine.Extensions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

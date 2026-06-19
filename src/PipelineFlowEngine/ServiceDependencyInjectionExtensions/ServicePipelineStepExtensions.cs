@@ -17,15 +17,15 @@
 #region U S A G E S
 
 using Microsoft.Extensions.DependencyInjection;
-using PipelineFlowEngine.Abstractions;
-using PipelineFlowEngine.Extensions;
-using PipelineFlowEngine.Pipeline;
+using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Extensions;
+using RzR.PipelineFlowEngine.Pipeline;
 using System;
 using System.Collections.Generic;
 
 #endregion
 
-namespace PipelineFlowEngine.ServiceDependencyInjectionExtensions
+namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -80,7 +80,7 @@ namespace PipelineFlowEngine.ServiceDependencyInjectionExtensions
             ServiceLifetime stepLifetime = ServiceLifetime.Scoped)
             where TPipelineItem : class
         {
-            if (step.BaseType.IsPipelineFlowStep<TPipelineItem>())
+            if (step.BaseType?.IsPipelineFlowStep<TPipelineItem>() == true)
             {
                 serviceCollection.Add(ServiceDescriptor.Describe(
                     typeof(IPipelineFlowStep<TPipelineItem>),
@@ -111,7 +111,7 @@ namespace PipelineFlowEngine.ServiceDependencyInjectionExtensions
         {
             foreach (var step in steps)
             {
-                if (step.BaseType.IsPipelineFlowStep<TPipelineItem>())
+                if (step.BaseType?.IsPipelineFlowStep<TPipelineItem>() == true)
                 {
                     serviceCollection.Add(ServiceDescriptor.Describe(
                         typeof(IPipelineFlowStep<TPipelineItem>),
