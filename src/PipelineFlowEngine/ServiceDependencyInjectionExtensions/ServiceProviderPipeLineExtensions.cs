@@ -17,16 +17,16 @@
 #region U S A G E S
 
 using Microsoft.Extensions.DependencyInjection;
-using PipelineFlowEngine.Pipeline;
+using RzR.PipelineFlowEngine.Pipeline;
 using System;
 
 #endregion
 
-namespace PipelineFlowEngine.ServiceDependencyInjectionExtensions
+namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     A service provider pipe line extensions.
+    ///     A service provider pipeline extensions.
     /// </summary>
     /// =================================================================================================
     public static class ServiceProviderPipeLineExtensions

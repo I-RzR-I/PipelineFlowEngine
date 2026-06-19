@@ -2,7 +2,18 @@
 
 | Name     | Details |
 |----------|----------|
-| PipelineFlowEngine | [![NuGet Version](https://img.shields.io/nuget/v/PipelineFlowEngine.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/PipelineFlowEngine/) [![Nuget Downloads](https://img.shields.io/nuget/dt/PipelineFlowEngine.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/PipelineFlowEngine)|
+| RzR.PipelineFlowEngine | [![NuGet Version](https://img.shields.io/nuget/v/RzR.PipelineFlowEngine.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/RzR.PipelineFlowEngine/) [![Nuget Downloads](https://img.shields.io/nuget/dt/RzR.PipelineFlowEngine.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/RzR.PipelineFlowEngine)|
+
+<details>
+
+  <summary>Old version</summary>
+  
+[![NuGet Version](https://img.shields.io/nuget/v/PipelineFlowEngine.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/PipelineFlowEngine/)
+[![Nuget Downloads](https://img.shields.io/nuget/dt/PipelineFlowEngine.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/PipelineFlowEngine)
+
+</details>
+
+<br />
 
 This repository provides a robust and extensible implementation of a unidirectional processing pipeline flow designed to execute a series of interdependent methods. The pipeline architecture implementation is based on the step-by-step execution model, where each step represents a distinct unit of logic that contributes to the overall workflow.
 
@@ -16,7 +27,7 @@ This repository provides a robust and extensible implementation of a unidirectio
 
 * **Pre-Execution Validation**: Before a step is executed, it can optionally perform validation to ensure all preconditions are met. If validation fails, the pipeline can halt, skip or retry the step based on configuration.
 
-* **Retry Policies**: Built-in support for retry mechanisms allows transient failures to be handled gracefully, with options for retry count, delay strategies, and exception filtering.
+* **Retry Policies**: Built-in support for retry mechanisms allows transient failures to be handled gracefully, with options for a bounded retry count (`RetryIterations`) for simple steps and a full interval/iteration policy (`ScheduledJobOptions`) for scheduled steps.
 
 * **Execution Logging**: Each step's execution details—including status, duration, and any exceptions—are logged to facilitate debugging, monitoring, and auditability.
 
@@ -36,11 +47,17 @@ This repository provides a robust and extensible implementation of a unidirectio
 
 To understand more efficiently how you can use available functionalities please consult the [using documentation/file](docs/usage.md).
 
-**In case you wish to use it in your project, u can install the package from <a href="https://www.nuget.org/packages/PipelineFlowEngine" target="_blank">nuget.org</a>** or specify what version you want:
+##### When to use / when not to use
 
-> `Install-Package PipelineFlowEngine -Version x.x.x.x`
+This library fits well when your processing flow is **in-process, linear, and scoped to a single entity per invocation** — for example, state-transition pipelines, validation chains, data enrichment, or business rule sequences where per-step audit and retry are useful.
+
+It is **not** designed for: durable or long-running workflows that survive process restarts, branching/DAG execution graphs, high-throughput parallel workloads, cross-service orchestration, or scenarios that require rollback and compensation logic.
+
+**In case you wish to use it in your project, you can install the package from <a href="https://www.nuget.org/packages/RzR.PipelineFlowEngine" target="_blank">nuget.org</a>** or specify what version you want:
+
+> `Install-Package RzR.PipelineFlowEngine -Version x.x.x.x`
 
 ## Content
 1. [USING](docs/usage.md)
-1. [CHANGELOG](docs/CHANGELOG.md)
-1. [BRANCH-GUIDE](docs/branch-guide.md)
+2. [CHANGELOG](docs/CHANGELOG.md)
+2. [BRANCH-GUIDE](docs/branch-guide.md)

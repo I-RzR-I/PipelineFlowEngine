@@ -1,8 +1,14 @@
 # USING
 
-This repository uses the Microsoft reference packages:
-* `Microsoft.Extensions.DependencyInjection`
-* `Microsoft.Extensions.Logging.Abstractions`
+This package pulls in the following dependencies:
+
+| Package | Version | Purpose |
+| ------- | ------- | ------- |
+| `RzR.Extensions.Domain` | 6.x | Domain and extension helpers used internally |
+| `RzR.Scheduling.RecurringJobs` | 3.x | Scheduler behind `PipelineExecutionCommandType.Schedule` steps |
+| `Microsoft.Extensions.Logging.Abstractions` | 6.0.1 | Logging abstractions |
+
+Your consuming project also needs `Microsoft.Extensions.DependencyInjection` (for `IServiceCollection`) and a logging implementation.
 
 To be able to use functionalities, extension methods were implemented for `IServiceCollection` and `IServiceProvider`.
 
@@ -142,6 +148,44 @@ public class DocSetCreatedPipelineStep : PipeLineFlowStep<DocumentItemDto>
 }
 ```
 
+> Scheduled steps and `RetrySchedulePolicy`
+
+A step whose `ExecutionCommand` is `PipelineExecutionCommandType.Schedule` is executed through a recurring-job scheduler (`RzR.Scheduling.RecurringJobs`) instead of being run once inline. Its behaviour is configured through the step's `RetrySchedulePolicy` (`PipelineFlowRetryPolicy`):
+
+- `ExecutionSchedulerSettings` (`ScheduledJobOptions`, from the `RzR.Scheduling.RecurringJobs.Models` namespace) — the scheduler configuration. Intervals are `TimeSpan` values, not raw numbers:
+    - `SuccessInterval` (`TimeSpan`, default 1 minute) — wait after a successful iteration.
+    - `FailInterval` (`TimeSpan`, default 30 seconds) — wait before retrying after a failed iteration.
+    - `InitialDelay` (`TimeSpan?`) — delay before the first iteration.
+    - `MaxIterations` (`int?`) — maximum number of iterations.
+    - `StopOnFirstSuccess` / `StopOnFailure` / `ThrowOnFailure` (`bool`) — stop and throw conditions.
+- `RetryIterations` (`int`) — for a scheduled step this maps to the scheduler's `MaxIterations`; for a simple step under a `StepRetry` context it is the retry budget.
+- `WaitSchedulerExecution` (`bool`):
+    - `true` — the pipeline awaits the scheduled job to finish and evaluates its result (a "run/poll until ready, then continue" pattern).
+    - `false` — **fire-and-forget**: the step is dispatched to the scheduler and the pipeline advances immediately, without waiting for or evaluating its result. Background faults are logged but are never surfaced on the pipeline result.
+- `StopExecutionIfSuccessful` (`bool`) — maps to the scheduler's `StopOnFirstSuccess` (stop after the first successful iteration).
+- `ThreadSleepBeforeExecution` (`bool`) — when `true` and `SuccessInterval` is greater than zero, defers the first iteration by `SuccessInterval`.
+
+```csharp
+public override PipelineExecutionCommandType ExecutionCommand
+    => PipelineExecutionCommandType.Schedule;
+
+public override PipelineFlowRetryPolicy RetrySchedulePolicy => new()
+{
+    WaitSchedulerExecution = true, // false = fire-and-forget
+    RetryIterations = 3, // maps to the scheduler MaxIterations
+    StopExecutionIfSuccessful = true, // stop after the first success
+    ExecutionSchedulerSettings = new ScheduledJobOptions
+    {
+        StopOnFailure = false,
+        ThrowOnFailure = false,
+        FailInterval = TimeSpan.FromMinutes(1),
+        SuccessInterval = TimeSpan.FromMinutes(1)
+    }
+};
+```
+
+**Important:** a scheduled step owns its own repetition through the scheduler (`MaxIterations`). A scheduled step running under a context whose `FailExecutionStrategy` is `StepRetry` is treated as terminal on failure — the context-level `StepRetry` does **not** additionally re-run a scheduled step (the two retry mechanisms do not stack).
+
 > Register the pipeline context and steps to DI
 
 Registration must be defined in the `Startup.cs` file/class or in your related startup application definition.
@@ -170,6 +214,8 @@ _serviceCollection.AddPipelineFlowEngineSteps<DTO>(
     });
 ```
 
+**Lifetime:** the invoker holds mutable per-invocation state, so it must be registered as `Scoped` (the default) or `Transient`. Passing `ServiceLifetime.Singleton` to `RegisterPipelineFlowEngine` throws `NotSupportedException`.
+
 > Invoke pipeline execution
 
 ```csharp
@@ -181,6 +227,19 @@ var invoker = _serviceProvider.GetPipelineFlowEngineInvoker<DTO>();
 //  Invoke pipeline execution
 var result = await invoker.InvokeAsync(objectData);
 ```
+
+`InvokeAsync` also accepts a `CancellationToken`. Cancellation is honoured between steps and propagated as an `OperationCanceledException` (it is not swallowed into a failure result); a cancelled token also stops any in-flight scheduled jobs.
+
+> The result
+
+`InvokeAsync` returns a `PipeLineResult<T>` exposing:
+
+- `IsSuccess` (`bool`) — whether the pipeline completed successfully.
+- `Status` (`PipelineStatusType`) and `State` (`PipelineStateType`) — the outcome and lifecycle state.
+- `Message` (`string`) — the failure or summary message when set.
+- `FlowResponse` (`T`) — the processed object.
+- `Events` (`IEnumerable<PipelineFlowEvent>`) — a UTC-timestamped audit log of the run.
+- `StepResults` (`IReadOnlyList<PipelineFlowStepResult<T>>`) — per-step outcomes tagged `FirstExecution` / `RetryExecution`, collected when the context's `IsEnabledStepResultCollector` is `true`.
 
 After registering the pipeline and its steps, can be added/registered new steps with the possibility to define how they will be executed with the method `AddPipelineStep`.
 

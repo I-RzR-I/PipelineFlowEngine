@@ -16,16 +16,16 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.CommonExtensions.TypeParam;
-using MethodScheduler.Models;
-using PipelineFlowEngine.Abstractions;
-using PipelineFlowEngine.Enums;
+using RzR.Extensions.Domain.Reflection.TypeParam;
+using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Enums;
+using RzR.Scheduling.RecurringJobs.Models;
 
 // ReSharper disable UnusedMember.Global
 
 #endregion
 
-namespace PipelineFlowEngine.Models
+namespace RzR.PipelineFlowEngine.Models
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -46,7 +46,7 @@ namespace PipelineFlowEngine.Models
         ///     is set to the <seealso cref="PipelineExecutionCommandType.Schedule"/> flag.
         /// </remarks>
         /// =================================================================================================
-        public SchedulerSettings ExecutionSchedulerSettings { get; set; }
+        public ScheduledJobOptions ExecutionSchedulerSettings { get; set; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -90,10 +90,11 @@ namespace PipelineFlowEngine.Models
         ///     Gets or sets a value indicating whether the thread sleep before execution.
         /// </summary>
         /// <remarks>
-        ///     Waiting time consists of:
-        ///     <seealso cref="RetryIterations"/> * 
-        ///     <seealso cref="SchedulerSettings.SuccessInterval"/> * 
-        ///     <seealso cref="SchedulerSettings.FailInterval"/>
+        ///     When <c>true</c> and <see cref="ScheduledJobOptions.SuccessInterval"/> is greater than
+        ///     <see cref="System.TimeSpan.Zero"/>, the first scheduled execution is deferred by
+        ///     <see cref="ScheduledJobOptions.SuccessInterval"/> via the scheduler's
+        ///     <see cref="ScheduledJobOptions.InitialDelay"/>. Has no effect when
+        ///     <see cref="ScheduledJobOptions.SuccessInterval"/> is <see cref="System.TimeSpan.Zero"/>.
         /// </remarks>
         /// <value>
         ///     True if thread sleep before execution, false if not.
@@ -108,7 +109,7 @@ namespace PipelineFlowEngine.Models
         /// =================================================================================================
         public PipelineFlowRetryPolicy()
         {
-            ExecutionSchedulerSettings = new SchedulerSettings();
+            ExecutionSchedulerSettings = new ScheduledJobOptions();
             RetryIterations = 1;
             WaitSchedulerExecution = true;
             StopExecutionIfSuccessful = true;
@@ -120,7 +121,7 @@ namespace PipelineFlowEngine.Models
         ///     Initializes a new instance of the <see cref="PipelineFlowRetryPolicy"/> class.
         /// </summary>
         /// <param name="scheduleSetting">
-        ///     The schedule setting.
+        ///     The <see cref="ScheduledJobOptions"/> schedule setting.
         ///     If the parameter value is null, then object will be initialized with default values.
         /// </param>
         /// <param name="retryIterations">
@@ -144,14 +145,14 @@ namespace PipelineFlowEngine.Models
         /// </param>
         /// =================================================================================================
         public PipelineFlowRetryPolicy(
-            SchedulerSettings scheduleSetting,
+            ScheduledJobOptions scheduleSetting,
             int retryIterations,
             bool waitSchedulerExecution = true,
             bool stopExecutionIfSuccessful = true,
-            bool threadSleepBeforeExecution = true)
+            bool threadSleepBeforeExecution = false)
         {
-            ExecutionSchedulerSettings = scheduleSetting.IfIsNull(new SchedulerSettings());
-            RetryIterations = retryIterations.IfIsNull(1);
+            ExecutionSchedulerSettings = scheduleSetting.IfIsNull(new ScheduledJobOptions());
+            RetryIterations = retryIterations;
             WaitSchedulerExecution = waitSchedulerExecution;
             StopExecutionIfSuccessful = stopExecutionIfSuccessful;
             ThreadSleepBeforeExecution = threadSleepBeforeExecution;

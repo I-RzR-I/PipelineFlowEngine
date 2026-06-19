@@ -16,18 +16,16 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.ArraysExtensions;
-using PipelineFlowEngine.Extensions;
+using RzR.PipelineFlowEngine.Extensions;
 using System.Collections.Generic;
-using System.Linq;
 
 #endregion
 
-namespace PipelineFlowEngine.Models.Result
+namespace RzR.PipelineFlowEngine.Models.Result
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Encapsulates the result of a pipe line. This class cannot be inherited.
+    ///     Encapsulates the result of a pipeline. This class cannot be inherited.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
     /// <seealso cref="T:PipelineFlowEngine.Models.Result.FlowResult{T}"/>
@@ -36,13 +34,20 @@ namespace PipelineFlowEngine.Models.Result
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        ///     (Immutable) the step results.
+        /// </summary>
+        /// =================================================================================================
+        private readonly List<PipelineFlowStepResult<T>> _stepResults = new List<PipelineFlowStepResult<T>>();
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         ///     Gets the step results.
         /// </summary>
         /// <value>
         ///     The step results.
         /// </value>
         /// =================================================================================================
-        public IEnumerable<PipelineFlowStepResult<T>> StepResults { get; private set; }
+        public IEnumerable<PipelineFlowStepResult<T>> StepResults => _stepResults;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -58,7 +63,7 @@ namespace PipelineFlowEngine.Models.Result
         /// <param name="stepResults">The step results.</param>
         /// =================================================================================================
         public PipeLineResult(IEnumerable<PipelineFlowStepResult<T>> stepResults)
-            => StepResults = stepResults;
+            => _stepResults.AddRange(stepResults);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -69,7 +74,7 @@ namespace PipelineFlowEngine.Models.Result
         /// </returns>
         /// =================================================================================================
         public static PipeLineResult<T> Success()
-            => new PipeLineResult<T>().SetSuccess().AsPipelineResult();
+            => new PipeLineResult<T>().SetSuccess().AsPipelineResult<T>();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -80,7 +85,7 @@ namespace PipelineFlowEngine.Models.Result
         /// </returns>
         /// =================================================================================================
         public static PipeLineResult<T> Failure()
-            => new PipeLineResult<T>().SetFailure().AsPipelineResult();
+            => new PipeLineResult<T>().SetFailure().AsPipelineResult<T>();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -93,7 +98,7 @@ namespace PipelineFlowEngine.Models.Result
         /// =================================================================================================
         public PipeLineResult<T> AppendStepResult(PipelineFlowStepResult<T> stepResult)
         {
-            StepResults = (StepResults ?? new List<PipelineFlowStepResult<T>>()).ToArray().AppendItem(stepResult);
+            _stepResults.Add(stepResult);
 
             return this;
         }
@@ -109,7 +114,8 @@ namespace PipelineFlowEngine.Models.Result
         /// =================================================================================================
         public PipeLineResult<T> SetStepResults(IEnumerable<PipelineFlowStepResult<T>> stepResults)
         {
-            StepResults = stepResults;
+            _stepResults.Clear();
+            _stepResults.AddRange(stepResults);
 
             return this;
         }

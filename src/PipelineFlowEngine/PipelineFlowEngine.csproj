@@ -24,6 +24,9 @@
 		<Language>en-US</Language>
 		<RepositoryType>GIT</RepositoryType>
 		<PackageIconUrl />
+
+		<RootNamespace>RzR.PipelineFlowEngine</RootNamespace>
+		<AssemblyName>RzR.PipelineFlowEngine</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -54,9 +57,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DomainCommonExtensions" Version="2.3.0.7698" />
-		<PackageReference Include="MethodScheduler" Version="2.1.0.8378" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.32" />
+		<PackageReference Include="RzR.Extensions.Domain" Version="6.0.0.8301" />
+		<PackageReference Include="RzR.Scheduling.RecurringJobs" Version="3.1.0.8026" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
 	</ItemGroup>
 
 </Project>

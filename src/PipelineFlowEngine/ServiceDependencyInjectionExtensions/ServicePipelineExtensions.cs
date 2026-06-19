@@ -17,14 +17,17 @@
 #region U S A G E S
 
 using Microsoft.Extensions.DependencyInjection;
-using PipelineFlowEngine.Abstractions;
-using PipelineFlowEngine.Pipeline;
+using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Pipeline;
+using RzR.Scheduling.RecurringJobs;
+using RzR.Scheduling.RecurringJobs.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
-namespace PipelineFlowEngine.ServiceDependencyInjectionExtensions
+namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -53,12 +56,13 @@ namespace PipelineFlowEngine.ServiceDependencyInjectionExtensions
             where TPipelineItem : class
             where TPersonPipelineContext : class, IPipelineFlowContext<TPipelineItem>
         {
+            if (serviceCollection.All(d => d.ServiceType != typeof(IMethodScheduler)))
+                serviceCollection.AddMethodScheduler();
+
             switch (stepLifetime)
             {
                 case ServiceLifetime.Singleton:
-                    serviceCollection.AddSingleton<PipelineFlowInvoker<TPipelineItem>>();
-                    serviceCollection.AddSingleton<IPipelineFlowContext<TPipelineItem>, TPersonPipelineContext>();
-                    break;
+                    throw new NotSupportedException("PipelineFlowInvoker<T> holds mutable per-invocation state and cannot be registered as a Singleton. Use ServiceLifetime.Scoped or ServiceLifetime.Transient.");
                 case ServiceLifetime.Transient:
                     serviceCollection.AddTransient<PipelineFlowInvoker<TPipelineItem>>();
                     serviceCollection.AddTransient<IPipelineFlowContext<TPipelineItem>, TPersonPipelineContext>();
@@ -93,12 +97,13 @@ namespace PipelineFlowEngine.ServiceDependencyInjectionExtensions
             where TPipelineItem : class
             where TPersonPipelineContext : class, IPipelineFlowContext<TPipelineItem>
         {
+            if (serviceCollection.All(d => d.ServiceType != typeof(IMethodScheduler)))
+                serviceCollection.AddMethodScheduler();
+
             switch (stepLifetime)
             {
                 case ServiceLifetime.Singleton:
-                    serviceCollection.AddSingleton<PipelineFlowInvoker<TPipelineItem>>();
-                    serviceCollection.AddSingleton<IPipelineFlowContext<TPipelineItem>, TPersonPipelineContext>();
-                    break;
+                    throw new NotSupportedException("PipelineFlowInvoker<T> holds mutable per-invocation state and cannot be registered as a Singleton. Use ServiceLifetime.Scoped or ServiceLifetime.Transient.");
                 case ServiceLifetime.Transient:
                     serviceCollection.AddTransient<PipelineFlowInvoker<TPipelineItem>>();
                     serviceCollection.AddTransient<IPipelineFlowContext<TPipelineItem>, TPersonPipelineContext>();

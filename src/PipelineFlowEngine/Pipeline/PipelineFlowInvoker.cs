@@ -16,33 +16,33 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.ArraysExtensions;
-using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.CommonExtensions.TypeParam;
-using DomainCommonExtensions.DataTypeExtensions;
-using MethodScheduler.Helpers;
-using MethodScheduler.Models;
 using Microsoft.Extensions.Logging;
-using PipelineFlowEngine.Abstractions;
-using PipelineFlowEngine.Enums;
-using PipelineFlowEngine.Extensions;
-using PipelineFlowEngine.Helpers;
-using PipelineFlowEngine.Models;
-using PipelineFlowEngine.Models.Result;
+using RzR.Extensions.Domain.Collections;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Extensions.Domain.Reflection.TypeParam;
+using RzR.Extensions.Domain.Text;
+using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Extensions;
+using RzR.PipelineFlowEngine.Helpers;
+using RzR.PipelineFlowEngine.Models;
+using RzR.PipelineFlowEngine.Models.Result;
+using RzR.Scheduling.RecurringJobs.Abstractions;
+using RzR.Scheduling.RecurringJobs.Helpers;
+using RzR.Scheduling.RecurringJobs.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-using PipeInvokeMessage = PipelineFlowEngine.Helpers.DefaultMessagesHelper.PipelineFlowInvokerMessage;
+using PipeInvokeMessage = RzR.PipelineFlowEngine.Helpers.DefaultMessagesHelper.PipelineFlowInvokerMessage;
 
 #pragma warning disable CS0162 
 // ReSharper disable HeuristicUnreachableCode
 
 #endregion
 
-namespace PipelineFlowEngine.Pipeline
+namespace RzR.PipelineFlowEngine.Pipeline
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -96,6 +96,13 @@ namespace PipelineFlowEngine.Pipeline
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
+        ///     (Immutable) the method scheduler used to run scheduled pipeline steps.
+        /// </summary>
+        /// =================================================================================================
+        private readonly IMethodScheduler _methodScheduler;
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
         ///     The pipeline flow steps.
         /// </summary>
         /// <value>
@@ -111,15 +118,21 @@ namespace PipelineFlowEngine.Pipeline
         /// <param name="context">The pipeline flow context.</param>
         /// <param name="logger">The pipeline flow logger.</param>
         /// <param name="steps">A variable-length parameters list containing pipeline flow steps.</param>
+        /// <param name="methodScheduler">
+        ///     (Optional) The <see cref="IMethodScheduler"/> used for scheduled pipeline steps.
+        ///     When null, falls back to <see cref="MethodSchedulerService.Default"/>.
+        /// </param>
         /// =================================================================================================
         public PipelineFlowInvoker(
             IPipelineFlowContext<T> context,
             ILogger<PipelineFlowInvoker<T>> logger,
-            IEnumerable<IPipelineFlowStep<T>> steps)
+            IEnumerable<IPipelineFlowStep<T>> steps,
+            IMethodScheduler methodScheduler = null)
         {
             _context = context;
             _logger = logger;
             Steps = steps.IfIsNull(new List<IPipelineFlowStep<T>>()).ToList();
+            _methodScheduler = methodScheduler ?? MethodSchedulerService.Default;
 
             _events = new List<PipelineFlowEvent>();
             _stepResults = new List<PipelineFlowStepResult<T>>();
@@ -160,8 +173,14 @@ namespace PipelineFlowEngine.Pipeline
         /// <summary>
         ///     Adds a pipeline steps to the pipeline flow context.
         /// </summary>
+        /// <remarks>
+        ///     This overload instantiates each step via <see cref="Activator.CreateInstance(Type)"/> and
+        ///     therefore only supports steps with a parameterless constructor. Steps that require
+        ///     constructor-injected dependencies must be registered through the DI extensions
+        ///     (<c>AddPipelineFlowEngineStep</c> / <c>AddPipelineFlowEngineSteps</c>) instead.
+        /// </remarks>
         /// <param name="stepExecutionStrategy">
-        ///     (Optional) The step execution strategy.     
+        ///     (Optional) The step execution strategy.
         ///     Default value is <seealso cref="PipelineStepExecutionStrategyType.AddInQueue"/>
         /// </param>
         /// <param name="stepsType">
@@ -177,7 +196,7 @@ namespace PipelineFlowEngine.Pipeline
 
             foreach (var step in stepsType)
             {
-                if (step.BaseType.IsPipelineFlowStep())
+                if (step.BaseType?.IsPipelineFlowStep() == true)
                     AddPipelineStep((IPipelineFlowStep<T>)Activator.CreateInstance(step), stepExecutionStrategy);
             }
         }
@@ -195,14 +214,14 @@ namespace PipelineFlowEngine.Pipeline
 
             foreach (var step in steps)
             {
-                if (step.Step.GetType().BaseType.IsPipelineFlowStep())
+                if (step.Step.GetType().BaseType?.IsPipelineFlowStep() == true)
                     AddPipelineStep(step.Step, step.StepExecutionStrategy);
             }
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Executes/Invoke the the pipeline steps and return the execution result.
+        ///     Executes/Invoke the pipeline steps and return the execution result.
         /// </summary>
         /// <param name="pipelineItem">The pipeline flow item.</param>
         /// <param name="cancellationToken">
@@ -253,23 +272,25 @@ namespace PipelineFlowEngine.Pipeline
 
                 foreach (var step in Steps.WithIndex())
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     SetLogAndEvent(LogLevel.Information,
                         PipeInvokeMessage.InitExecutionStepXFromY.FormatWith(step.item.ExecutionOrderIndex, step.index + 1, totalSteps));
 
                     if (step.item.PreExecutionValidationAsync.IsNotNull())
                     {
-                        var preValidation = await DoPreExecutionValidationAsync(step.item.PreExecutionValidationAsync, pipelineItem);
+                        var preValidation = await DoPreExecutionValidationAsync(step.item.PreExecutionValidationAsync, pipelineItem).ConfigureAwait(false);
 
                         // Log event information 
                         SetLogAndEvent(LogLevel.Information,
                             PipeInvokeMessage.PreValidationExecutionStepResult.FormatWith(preValidation));
                         if (preValidation.IsFalse())
                         {
-                            return result
-                                .SetStepResults(_stepResults)
-                                .SetFlowEvent(_events)
-                                .SetFailure()
-                                .AsPipelineResult();
+                            return FlowResultExtensions
+                                .AsPipelineResult<T>(result
+                                    .SetStepResults(_stepResults)
+                                    .SetFlowEvent(_events)
+                                    .SetFailure());
                         }
                     }
 
@@ -283,33 +304,58 @@ namespace PipelineFlowEngine.Pipeline
                         var pipelineStepResult = new PipeLineStepResult<T>();
                         if (step.item.ExecutionCommand.AreEquals(PipelineExecutionCommandType.Schedule))
                         {
-                            scheduleRetryPolicy.ExecutionSchedulerSettings = scheduleRetryPolicy.ExecutionSchedulerSettings.
-                                IfIsNull(
-                                    new SchedulerSettings()
-                                    {
-                                        DisableOnFailure = true,
-                                        ThrowException = false,
-                                        FailInterval = 0.5,
-                                        SuccessInterval = 1.0
-                                    });
+                            var settings = scheduleRetryPolicy.ExecutionSchedulerSettings.IfIsNull(new ScheduledJobOptions());
 
-                            //Always wait X time before execution
-                            if (scheduleRetryPolicy.ThreadSleepBeforeExecution.IsTrue())
-                                ForceWaitBeforeExecution(scheduleRetryPolicy);
+                            var options = new ScheduledJobOptions
+                            {
+                                SuccessInterval = settings.SuccessInterval,
+                                FailInterval = settings.FailInterval,
+                                StopOnFailure = settings.StopOnFailure,
+                                ThrowOnFailure = settings.ThrowOnFailure,
+                                InitialDelay = settings.InitialDelay,
+                                MaxIterations = scheduleRetryPolicy.RetryIterations,
+                                StopOnFirstSuccess = scheduleRetryPolicy.StopExecutionIfSuccessful
+                            };
 
-                            MultipleScheduler.Instance.Start(
-                                scheduleMethod: async () =>
-                                {
-                                    pipelineStepResult = await step.item
-                                        .ExecuteStepAsync(pipelineItem, _context, _logger, cancellationToken)
-                                        .ConfigureAwait(false);
-                                },
-                                settings: scheduleRetryPolicy.ExecutionSchedulerSettings,
-                                stopAfterXIteration: scheduleRetryPolicy.RetryIterations.IfIsNull(1),
-                                forceStopAfterFirstSuccessExecution: scheduleRetryPolicy.StopExecutionIfSuccessful);
+                            if (scheduleRetryPolicy.ThreadSleepBeforeExecution.IsTrue() 
+                                && options.InitialDelay == null 
+                                && options.SuccessInterval > TimeSpan.Zero)
+                                options.InitialDelay = options.SuccessInterval;
+
+                            var job = _methodScheduler.Schedule(options, async token =>
+                            {
+                                pipelineStepResult = await step.item
+                                    .ExecuteStepAsync(pipelineItem, _context, _logger, token)
+                                    .ConfigureAwait(false);
+                            });
 
                             if (scheduleRetryPolicy.WaitSchedulerExecution.IsTrue())
-                                ForceWaitBeforeExecution(scheduleRetryPolicy);
+                            {
+                                // ReSharper disable once MethodSupportsCancellation
+                                using (cancellationToken.Register(() => { _ = job.StopAsync(); }))
+                                    await job.Completion.ConfigureAwait(false);
+
+                                cancellationToken.ThrowIfCancellationRequested();
+                            }
+                            else
+                            {
+                                var dispatchedStepName = step.item.GetType().Name;
+
+                                _ = job.Completion.ContinueWith(
+                                    t => _logger.IfEnabledWrite(LogLevel.Error,
+                                        PipeInvokeMessage.ScheduledStepXDispatchFaulted.FormatWith(dispatchedStepName), t.Exception),
+                                    CancellationToken.None,
+                                    TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+                                    TaskScheduler.Default);
+
+                                // ReSharper disable once MethodSupportsCancellation
+                                cancellationToken.Register(() => job.StopAsync());
+
+                                SetLogAndEvent(LogLevel.Information,
+                                    PipeInvokeMessage.ScheduledStepXDispatched.FormatWith(step.item.ExecutionOrderIndex));
+                                isExecuted = true;
+                                continue;
+                            }
                         }
                         else
                         {
@@ -321,7 +367,7 @@ namespace PipelineFlowEngine.Pipeline
                         if (_context.IsEnabledStepResultCollector.IsTrue())
                             _stepResults.Add(new PipelineFlowStepResult<T>()
                             {
-                                StepIteration = (stepRetryCount >= scheduleRetryPolicy.RetryIterations).IsTrue()
+                                StepIteration = (stepRetryCount > 0).IsTrue()
                                     ? PipelineFlowStepIterationType.RetryExecution
                                     : PipelineFlowStepIterationType.FirstExecution,
                                 StepName = step.item.GetType().Name,
@@ -349,6 +395,21 @@ namespace PipelineFlowEngine.Pipeline
                                     }
                                 case PipelineStepFailExecutionStrategyType.StepRetry:
                                     {
+                                        if (step.item.ExecutionCommand.AreEquals(PipelineExecutionCommandType.Schedule))
+                                        {
+                                            isExecuted = true;
+                                            var scheduledMessage = PipeInvokeMessage.ExecStepFailedPipelineStop.FormatWith(_context.FailExecutionStrategy);
+
+                                            SetLogAndEvent(LogLevel.Error, scheduledMessage);
+
+                                            return FlowResultExtensions
+                                                .AsPipelineResult<T>(result
+                                                    .SetStepResults(_stepResults)
+                                                    .SetMessage(scheduledMessage)
+                                                    .SetFlowEvent(_events)
+                                                    .SetFailure());
+                                        }
+
                                         SetLogAndEvent(LogLevel.Information,
                                             PipeInvokeMessage.ExecStepFailedStepRetried.FormatWith(_context.FailExecutionStrategy,
                                                 stepRetryCount, scheduleRetryPolicy.RetryIterations));
@@ -358,22 +419,22 @@ namespace PipelineFlowEngine.Pipeline
                                             isExecuted = true;
                                             var message = PipeInvokeMessage.ExecStepFailedStepRetryUsed.FormatWith(_context.FailExecutionStrategy);
 
-                                            // Log event information 
+                                            // Log event information
                                             SetLogAndEvent(LogLevel.Error, message);
 
-                                            return result
-                                                .SetStepResults(_stepResults)
-                                                .SetMessage(message)
-                                                .SetFlowEvent(_events)
-                                                .SetFailure()
-                                                .AsPipelineResult();
+                                            return FlowResultExtensions
+                                                .AsPipelineResult<T>(result
+                                                    .SetStepResults(_stepResults)
+                                                    .SetMessage(message)
+                                                    .SetFlowEvent(_events)
+                                                    .SetFailure());
                                         }
 
                                         isExecuted = false;
                                         stepRetryCount++;
                                         pipelineItem = copyTempData;
 
-                                        // Log event information 
+                                        // Log event information
                                         SetLogAndEvent(LogLevel.Warning,
                                                 PipeInvokeMessage.ExecStepFailedStepRetry.FormatWith(_context.FailExecutionStrategy));
 
@@ -389,12 +450,12 @@ namespace PipelineFlowEngine.Pipeline
                                         // Log event information 
                                         SetLogAndEvent(LogLevel.Error, message);
 
-                                        return result
-                                            .SetStepResults(_stepResults)
-                                            .SetMessage(message)
-                                            .SetFlowEvent(_events)
-                                            .SetFailure()
-                                            .AsPipelineResult();
+                                        return FlowResultExtensions
+                                            .AsPipelineResult<T>(result
+                                                .SetStepResults(_stepResults)
+                                                .SetMessage(message)
+                                                .SetFlowEvent(_events)
+                                                .SetFailure());
                                     }
                             }
                         }
@@ -407,6 +468,10 @@ namespace PipelineFlowEngine.Pipeline
                     .SetFlowEvent(_events)
                     .SetResult(pipelineItem)
                     .SetSuccess();
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -434,12 +499,12 @@ namespace PipelineFlowEngine.Pipeline
         {
             SetLogAndEvent(LogLevel.Error, PipeInvokeMessage.NoPipelineSteps);
 
-            return PipeLineResult<T>
-                .Failure()
-                .SetFlowEvent(_events)
-                .SetState(PipelineStateType.Finish)
-                .SetStatus(PipelineStatusType.Fail)
-                .AsPipelineResult();
+            return FlowResultExtensions
+                .AsPipelineResult<T>(PipeLineResult<T>
+                    .Failure()
+                    .SetFlowEvent(_events)
+                    .SetState(PipelineStateType.Finish)
+                    .SetStatus(PipelineStatusType.Fail));
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -456,7 +521,7 @@ namespace PipelineFlowEngine.Pipeline
         {
             try
             {
-                var preValidation = await executePrecondition.Invoke(currentObject);
+                var preValidation = await executePrecondition.Invoke(currentObject).ConfigureAwait(false);
                 if (preValidation.IsFalse())
                 {
                     // Log event information 
@@ -488,18 +553,5 @@ namespace PipelineFlowEngine.Pipeline
             _events.Add(new PipelineFlowEvent(level, this.GetType().Name,
                 DefaultMessagesHelper.FormatEventLog.FormatWith(this.GetType().GetFlowName(), message), exception));
         }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Force thread sleep execution.
-        /// </summary>
-        /// <param name="scheduleRetryPolicy">The schedule retry policy.</param>
-        /// =================================================================================================
-        private static void ForceWaitBeforeExecution(PipelineFlowRetryPolicy scheduleRetryPolicy)
-            => Thread.Sleep(
-                (scheduleRetryPolicy.RetryIterations
-                 * scheduleRetryPolicy.ExecutionSchedulerSettings.SuccessInterval
-                 * scheduleRetryPolicy.ExecutionSchedulerSettings.FailInterval).MinutesToMs()
-                );
     }
 }

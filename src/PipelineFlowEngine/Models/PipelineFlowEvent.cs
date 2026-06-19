@@ -25,7 +25,7 @@ using System;
 
 #endregion
 
-namespace PipelineFlowEngine.Models
+namespace RzR.PipelineFlowEngine.Models
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -79,7 +79,7 @@ namespace PipelineFlowEngine.Models
         ///     Gets or sets the event date.
         /// </summary>
         /// <value>
-        ///     The event date.
+        ///     The event date. Always stored in UTC.
         /// </value>
         /// =================================================================================================
         public DateTime EventDate { get; set; }
@@ -89,7 +89,7 @@ namespace PipelineFlowEngine.Models
         ///     Initializes a new instance of the <see cref="PipelineFlowEvent"/> class.
         /// </summary>
         /// =================================================================================================
-        public PipelineFlowEvent() => EventDate = DateTime.Now;
+        public PipelineFlowEvent() => EventDate = DateTime.UtcNow;
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -105,7 +105,7 @@ namespace PipelineFlowEngine.Models
             Name = name;
             Message = message;
             Exception = null;
-            EventDate = DateTime.Now;
+            EventDate = DateTime.UtcNow;
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ namespace PipelineFlowEngine.Models
             Name = name;
             Message = message;
             Exception = exception;
-            EventDate = DateTime.Now;
+            EventDate = DateTime.UtcNow;
         }
     }
 }

@@ -16,12 +16,12 @@
 
 #region U S A G E S
 
-using PipelineFlowEngine.Enums;
-using PipelineFlowEngine.Models.Result;
+using RzR.PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Models.Result;
 
 #endregion
 
-namespace PipelineFlowEngine.Models
+namespace RzR.PipelineFlowEngine.Models
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

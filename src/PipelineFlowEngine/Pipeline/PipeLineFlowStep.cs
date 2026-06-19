@@ -17,10 +17,10 @@
 #region U S A G E S
 
 using Microsoft.Extensions.Logging;
-using PipelineFlowEngine.Abstractions;
-using PipelineFlowEngine.Enums;
-using PipelineFlowEngine.Models;
-using PipelineFlowEngine.Models.Result;
+using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Models;
+using RzR.PipelineFlowEngine.Models.Result;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,11 +30,11 @@ using System.Threading.Tasks;
 
 #endregion
 
-namespace PipelineFlowEngine.Pipeline
+namespace RzR.PipelineFlowEngine.Pipeline
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     A pipe line flow step.
+    ///     A pipeline flow step.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
     /// <seealso cref="T:PipelineFlowEngine.Abstractions.IPipelineFlowStep{T}"/>

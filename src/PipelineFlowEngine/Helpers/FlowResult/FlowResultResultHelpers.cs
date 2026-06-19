@@ -16,12 +16,12 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.DataTypeExtensions;
 using Microsoft.Extensions.Logging;
-using PipelineFlowEngine.Enums;
-using PipelineFlowEngine.Extensions;
-using PipelineFlowEngine.Helpers;
-using System.Collections.Generic;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Extensions.Domain.Text;
+using RzR.PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Extensions;
+using RzR.PipelineFlowEngine.Helpers;
 using System.Linq;
 
 // ReSharper disable ArrangeThisQualifier
@@ -29,13 +29,13 @@ using System.Linq;
 
 #endregion
 
-namespace PipelineFlowEngine.Models.Result
+namespace RzR.PipelineFlowEngine.Models.Result
 {
     /// -------------------------------------------------------------------------------------------------
     /// <content>
     ///     Encapsulates the result methods of a flow.
     /// </content>
-    /// <seealso cref="PipelineFlowEngine.Models.Result.FlowResult{T}"/>
+    /// <seealso cref="RzR.PipelineFlowEngine.Models.Result.FlowResult{T}"/>
     /// =================================================================================================
     public abstract partial class FlowResult<T> where T : class
     {
@@ -52,7 +52,6 @@ namespace PipelineFlowEngine.Models.Result
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
                 DefaultMessagesHelper.FlowResultEventMessage.SetSuccess.FormatWith(this.GetType().GetFlowName()));
 
-            Events = Events;
             Status = PipelineStatusType.Success;
             State = PipelineStateType.Finish;
 
@@ -75,7 +74,6 @@ namespace PipelineFlowEngine.Models.Result
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
                 DefaultMessagesHelper.FlowResultEventMessage.SetSuccessWithResult.FormatWith(this.GetType().GetFlowName()));
 
-            Events = Events;
             Status = PipelineStatusType.Success;
             State = PipelineStateType.Finish;
 
@@ -98,7 +96,6 @@ namespace PipelineFlowEngine.Models.Result
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
                 DefaultMessagesHelper.FlowResultEventMessage.SetFailure.FormatWith(this.GetType().GetFlowName()));
 
-            Events = Events;
             Status = PipelineStatusType.Fail;
             State = PipelineStateType.Finish;
 
@@ -122,7 +119,6 @@ namespace PipelineFlowEngine.Models.Result
                 DefaultMessagesHelper.FlowResultEventMessage.SetFailureWithMessage.FormatWith(this.GetType().GetFlowName()));
 
             Message = message;
-            Events = Events;
             Status = PipelineStatusType.Fail;
             State = PipelineStateType.Finish;
 
@@ -228,11 +224,6 @@ namespace PipelineFlowEngine.Models.Result
         /// =================================================================================================
         private bool IsOkStatus()
             => Status == PipelineStatusType.Success
-               && Events.Any(x =>
-                   new List<LogLevel>
-                   {
-                       LogLevel.Critical,
-                       LogLevel.Error
-                   }.Contains(x.EventLevel)).IsFalse();
+               && Events.Any(x => x.EventLevel == LogLevel.Error || x.EventLevel == LogLevel.Critical).IsFalse();
     }
 }

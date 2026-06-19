@@ -17,17 +17,17 @@
 #region U S A G E S
 
 using Microsoft.Extensions.Logging;
-using PipelineFlowEngine.Enums;
-using PipelineFlowEngine.Models;
-using PipelineFlowEngine.Models.Result;
-using PipelineFlowEngine.Pipeline;
+using RzR.PipelineFlowEngine.Enums;
+using RzR.PipelineFlowEngine.Models;
+using RzR.PipelineFlowEngine.Models.Result;
+using RzR.PipelineFlowEngine.Pipeline;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 #endregion
 
-namespace PipelineFlowEngine.Abstractions
+namespace RzR.PipelineFlowEngine.Abstractions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

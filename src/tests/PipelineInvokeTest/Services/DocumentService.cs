@@ -14,9 +14,8 @@
 //  </summary>
 // ***********************************************************************
 
-using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.DataTypeExtensions;
 using PipelineInvokeTest.Models;
+using RzR.Extensions.Domain.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -14,7 +14,7 @@
 //  </summary>
 // ***********************************************************************
 
-namespace PipelineFlowEngine.Enums
+namespace RzR.PipelineFlowEngine.Enums
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -24,7 +24,7 @@ namespace PipelineFlowEngine.Enums
     public enum PipelineStepExecutionStrategyType
     {
         /// <summary>
-        ///     An enum constant representing the add in queue option.
+        ///     An enum constant representing the add-in queue option.
         /// </summary>
         AddInQueue,
 

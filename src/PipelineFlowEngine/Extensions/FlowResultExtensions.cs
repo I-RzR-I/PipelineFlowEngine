@@ -16,11 +16,11 @@
 
 #region U S A G E S
 
-using PipelineFlowEngine.Models.Result;
+using RzR.PipelineFlowEngine.Models.Result;
 
 #endregion
 
-namespace PipelineFlowEngine.Extensions
+namespace RzR.PipelineFlowEngine.Extensions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>

@@ -16,14 +16,14 @@
 
 #region U S A G E S
 
-using PipelineFlowEngine.Abstractions;
-using PipelineFlowEngine.Models.Result;
-using PipelineFlowEngine.Pipeline;
+using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Models.Result;
+using RzR.PipelineFlowEngine.Pipeline;
 using System;
 
 #endregion
 
-namespace PipelineFlowEngine.Extensions
+namespace RzR.PipelineFlowEngine.Extensions
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
@@ -34,8 +34,7 @@ namespace PipelineFlowEngine.Extensions
     {
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     A Type extension method that query if 'sourceType' is typeof <see cref="PipeLineResult{T}"/>
-        ///     .
+        ///     A Type extension method that query if 'sourceType' is typeof <see cref="PipeLineResult{T}"/>.
         /// </summary>
         /// <param name="sourceType">The sourceType to act on.</param>
         /// <returns>
@@ -73,6 +72,7 @@ namespace PipelineFlowEngine.Extensions
                 return "PIPELINE";
             if (sourceType.IsPipeLineStepResult())
                 return "PIPELINESTEP";
+
             return "FLOW";
         }
 
@@ -86,7 +86,9 @@ namespace PipelineFlowEngine.Extensions
         /// </returns>
         /// =================================================================================================
         internal static bool IsPipelineFlowStep(this Type sourceType)
-            => sourceType.Name == typeof(PipeLineFlowStep<>).Name || sourceType.Name == typeof(IPipelineFlowStep<>).Name;
+            => sourceType.IsGenericType
+                && (sourceType.GetGenericTypeDefinition() == typeof(PipeLineFlowStep<>)
+                    || sourceType.GetGenericTypeDefinition() == typeof(IPipelineFlowStep<>));
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

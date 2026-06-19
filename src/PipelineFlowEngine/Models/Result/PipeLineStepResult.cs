@@ -16,15 +16,15 @@
 
 #region U S A G E S
 
-using PipelineFlowEngine.Extensions;
+using RzR.PipelineFlowEngine.Extensions;
 
 #endregion
 
-namespace PipelineFlowEngine.Models.Result
+namespace RzR.PipelineFlowEngine.Models.Result
 {
     /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Encapsulates the result of a pipe line step. This class cannot be inherited.
+    ///     Encapsulates the result of a pipeline step. This class cannot be inherited.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
     /// <seealso cref="T:PipelineFlowEngine.Models.Result.FlowResult{T}"/>
@@ -47,7 +47,7 @@ namespace PipelineFlowEngine.Models.Result
         /// </returns>
         /// =================================================================================================
         public static PipeLineStepResult<T> Success()
-            => new PipeLineStepResult<T>().SetSuccess().AsPipelineStepResult();
+            => new PipeLineStepResult<T>().SetSuccess().AsPipelineStepResult<T>();
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
@@ -58,6 +58,6 @@ namespace PipelineFlowEngine.Models.Result
         /// </returns>
         /// =================================================================================================
         public static PipeLineStepResult<T> Failure()
-            => new PipeLineStepResult<T>().SetFailure().AsPipelineStepResult();
+            => new PipeLineStepResult<T>().SetFailure().AsPipelineStepResult<T>();
     }
 }
