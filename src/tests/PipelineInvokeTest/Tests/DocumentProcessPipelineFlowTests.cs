@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-07-09 18:15
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-12 00:01
-// ***********************************************************************
-//  <copyright file="DocumentProcessPipelineFlowTests.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 #region U S A G E S
 
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +11,7 @@ using RzR.PipelineFlowEngine.Enums;
 using RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 #endregion
@@ -74,7 +59,7 @@ namespace PipelineInvokeTest.Tests
 
             var obj = new DocumentItemDto
             {
-                Id = Guid.NewGuid(), 
+                Id = Guid.NewGuid(),
                 IsActive = true
             };
             await service.AddAsync(obj);
@@ -86,6 +71,51 @@ namespace PipelineInvokeTest.Tests
             Assert.IsNotNull(result.FlowResponse);
             Assert.AreEqual(PipelineStateType.Finish, result.State);
             Assert.AreEqual(PipelineStatusType.Success, result.Status);
+        }
+
+        [TestMethod]
+        public async Task DocumentLookup_WithALiveToken_ReturnsTheStoredDocument()
+        {
+
+            _serviceCollection.AddScoped<DocumentService>();
+
+            var localServiceProvider = _serviceCollection.BuildServiceProvider();
+            var service = localServiceProvider.GetRequiredService<DocumentService>();
+
+            var document = new DocumentItemDto { Id = Guid.NewGuid(), IsActive = true };
+            await service.AddAsync(document);
+
+            using var cancellationTokenSource = new CancellationTokenSource();
+
+            var found = await service.GetAsync(document.Id, cancellationTokenSource.Token);
+
+            Assert.IsNotNull(found,
+                "A lookup handed a live token must answer exactly like one made without a token; accepting a "
+                + "token may not change what the lookup returns.");
+            Assert.AreEqual(document.Id, found.Id,
+                "The lookup must return the document that was asked for.");
+        }
+
+        [TestMethod]
+        public async Task DocumentLookup_WithACancelledToken_ThrowsInsteadOfReturningTheDocument()
+        {
+
+            _serviceCollection.AddScoped<DocumentService>();
+
+            var localServiceProvider = _serviceCollection.BuildServiceProvider();
+            var service = localServiceProvider.GetRequiredService<DocumentService>();
+
+            var document = new DocumentItemDto { Id = Guid.NewGuid(), IsActive = true };
+            await service.AddAsync(document);
+
+            using var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            await Assert.ThrowsExceptionAsync<OperationCanceledException>(
+                () => service.GetAsync(document.Id, cancellationTokenSource.Token),
+                "A lookup that takes a token must honour it. One that accepts a token and ignores it is worse "
+                + "than one that never took it: a precondition forwarding the pipeline token would look "
+                + "cancellable while still doing its work after the caller walked away.");
         }
     }
 }

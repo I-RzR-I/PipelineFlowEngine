@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-07-01 17:45
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-09 15:42
-// ***********************************************************************
-//  <copyright file="PersonSetBlockedPipelineStep.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 #region U S A G E S
 
 using Microsoft.Extensions.DependencyInjection;
@@ -33,36 +17,19 @@ using System.Threading.Tasks;
 
 #endregion
 
-// ReSharper disable RedundantLambdaParameterType
-
 namespace PipelineInvokeTest.Pipelines.Steps.Person
 {
     public class PersonSetBlockedPipelineStep : PipeLineFlowStep<PersonDto>
     {
-        private static IServiceProvider _serviceProvider;
-        private static ILogger<PersonSetBlockedPipelineStep> _logger;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<PersonSetBlockedPipelineStep> _logger;
 
         public PersonSetBlockedPipelineStep(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _logger = _serviceProvider.GetRequiredService<ILogger<PersonSetBlockedPipelineStep>>();
-        }
 
-        /// <inheritdoc />
-        public override int ExecutionOrderIndex => 2;
-
-        /// <inheritdoc />
-        public override bool IsEnabled => true;
-
-        /// <inheritdoc />
-        public override PipelineStateType State => PipelineStateType.Undefined;
-
-        /// <inheritdoc />
-        public override PipelineStatusType Status => PipelineStatusType.Undefined;
-
-        /// <inheritdoc />
-        public override Func<PersonDto, Task<bool>> PreExecutionValidationAsync { get; protected set; }
-            = async (PersonDto currentObject) =>
+            PreExecutionValidationAsync = async (PersonDto currentObject, CancellationToken cancellationToken) =>
             {
                 _logger.LogInformation("Do pre-execution validation");
                 var service = _serviceProvider.GetRequiredService<Service>();
@@ -70,15 +37,25 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
 
                 return await Task.FromResult(validation && currentObject.IsActive.IsFalse());
             };
+        }
 
-        /// <inheritdoc />
+        public override int ExecutionOrderIndex => 2;
+
+        public override bool IsEnabled => true;
+
+        public override PipelineStateType State => PipelineStateType.Undefined;
+
+        public override PipelineStatusType Status => PipelineStatusType.Undefined;
+
+        public override Func<PersonDto, CancellationToken, Task<bool>> PreExecutionValidationAsync { get; protected set; }
+
         public override async Task<PipeLineStepResult<PersonDto>> ExecuteStepAsync(
             PersonDto pipelineStep,
             IPipelineFlowContext<PersonDto> context,
             ILogger<PipelineFlowInvoker<PersonDto>> logger,
             CancellationToken cancellationToken = default)
         {
-            //var result = PipeLineStepResult<PersonDto>.Instance;
+
             var result = new PipeLineStepResult<PersonDto>();
             result.SetState(PipelineStateType.Initialize);
             try

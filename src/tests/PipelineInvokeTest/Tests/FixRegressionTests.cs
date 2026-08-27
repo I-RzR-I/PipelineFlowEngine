@@ -1,20 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly          : RzR.Shared.Services.PipelineInvokeTest
-//  Author            : RzR
-//  Created           : 18-06-2026 20:06
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 19-06-2026 21:49
-//  ***********************************************************************
-//  <copyright file="FixRegressionTests.cs" company="RzR SOFT & TECH">
-//      Copyright (c) RzR. All rights reserved.
-//  </copyright>
-//  <contact>
-//      https://iamrzr.dev/contact
-//  </contact>
-//  <summary></summary>
-//  ***********************************************************************
-
 #region U S I N G
 
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +13,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-// ReSharper disable InconsistentNaming
 
 #endregion
 
@@ -58,7 +39,7 @@ namespace PipelineInvokeTest.Tests
         [TestMethod]
         public async Task InvokeAsync_WithAlreadyCancelledToken_ThrowsOperationCanceledException()
         {
-            // Arrange
+
             var person = new PersonDto { Id = Guid.Empty, Name = "TestName", IsActive = true };
 
             _serviceCollection.RegisterPipelineFlowEngine<PersonDto, PersonPipelineContext>(
@@ -68,7 +49,7 @@ namespace PipelineInvokeTest.Tests
             var invoker = localServiceProvider.GetPipelineFlowEngineInvoker<PersonDto>();
 
             using var cts = new CancellationTokenSource();
-            cts.Cancel(); // token is already cancelled before the call
+            cts.Cancel();
 
             await Assert.ThrowsExceptionAsync<OperationCanceledException>(() => invoker.InvokeAsync(person, cts.Token));
         }
@@ -76,7 +57,7 @@ namespace PipelineInvokeTest.Tests
         [TestMethod]
         public async Task InvokeAsync_WithNonCancelledToken_CompletesSuccessfully()
         {
-            // Arrange
+
             var person = new PersonDto { Id = Guid.Empty, Name = "TestName", IsActive = true };
 
             _serviceCollection.RegisterPipelineFlowEngine<PersonDto, PersonPipelineContext>(
@@ -85,12 +66,10 @@ namespace PipelineInvokeTest.Tests
             var localServiceProvider = _serviceCollection.BuildServiceProvider();
             var invoker = localServiceProvider.GetPipelineFlowEngineInvoker<PersonDto>();
 
-            using var cts = new CancellationTokenSource(); // not cancelled
+            using var cts = new CancellationTokenSource();
 
-            // Act
             var result = await invoker.InvokeAsync(person, cts.Token);
 
-            // Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result.IsSuccess,
                 "A non-cancelled token must not cause the pipeline to report failure.");
@@ -99,14 +78,14 @@ namespace PipelineInvokeTest.Tests
         [TestMethod]
         public async Task InvokeAsync_MultiStepPipeline_WithAlreadyCancelledToken_ThrowsOperationCanceledException()
         {
-            // Arrange
+
             var person = new PersonDto { Id = Guid.Empty, Name = "TestName", IsActive = true };
 
             _serviceCollection.RegisterPipelineFlowEngine<PersonDto, PersonPipelineContext>(
                 new List<Type>
                 {
-                    typeof(PersonSetNamePipelineStep), 
-                    typeof(PersonSetIdPipelineStep), 
+                    typeof(PersonSetNamePipelineStep),
+                    typeof(PersonSetIdPipelineStep),
                     typeof(PeronSetInactivePipelineStep)
                 });
 
@@ -121,7 +100,7 @@ namespace PipelineInvokeTest.Tests
 
         [TestMethod]
         public void RegisterPipelineFlowEngine_WithStepList_SingletonLifetime_ThrowsNotSupportedException() =>
-            // Arrange + Act + Assert
+
             Assert.ThrowsException<NotSupportedException>(() =>
                 _serviceCollection.RegisterPipelineFlowEngine<PersonDto, PersonPipelineContext>(
                     new List<Type> { typeof(PersonSetNamePipelineStep) },
@@ -129,7 +108,7 @@ namespace PipelineInvokeTest.Tests
 
         [TestMethod]
         public void RegisterPipelineFlowEngine_WithoutStepList_SingletonLifetime_ThrowsNotSupportedException() =>
-            // Arrange + Act + Assert
+
             Assert.ThrowsException<NotSupportedException>(() =>
                 _serviceCollection.RegisterPipelineFlowEngine<PersonDto, PersonPipelineContext>(
                     ServiceLifetime.Singleton));
@@ -173,6 +152,10 @@ namespace PipelineInvokeTest.Tests
             var localServiceProvider = _serviceCollection.BuildServiceProvider();
             var invoker = localServiceProvider.GetPipelineFlowEngineInvoker<PersonDto>();
 
+            var retryIterations = new PersonSetCreatedTimePipelineStep(localServiceProvider)
+                .RetrySchedulePolicy.RetryIterations;
+            var expectedAttempts = retryIterations + 1;
+
             var result = await invoker.InvokeAsync(person);
 
             Assert.IsNotNull(result);
@@ -183,8 +166,9 @@ namespace PipelineInvokeTest.Tests
 
             var stepResults = result.StepResults.ToList();
 
-            Assert.IsTrue(stepResults.Count >= 1,
-                $"Expected at least 1 step-result entry; got {stepResults.Count}.");
+            Assert.AreEqual(expectedAttempts, stepResults.Count,
+                $"A step that fails every attempt must be executed {expectedAttempts} times (the first "
+                + $"execution plus {retryIterations} retries) and record one step-result entry per attempt.");
 
             Assert.AreEqual(
                 PipelineFlowStepIterationType.FirstExecution,

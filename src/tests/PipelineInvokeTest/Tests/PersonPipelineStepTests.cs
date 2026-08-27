@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-06-24 16:57
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-06-30 21:16
-// ***********************************************************************
-//  <copyright file="PersonPipelineStepTests.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 #region U S A G E S
 
 using Microsoft.Extensions.DependencyInjection;
@@ -49,7 +33,7 @@ namespace PipelineInvokeTest.Tests
             serviceCollection.AddLogging(loggingBuilder => loggingBuilder
                 .AddConsole()
                 .SetMinimumLevel(LogLevel.Debug));
-            
+
             _serviceCollection = serviceCollection;
         }
 

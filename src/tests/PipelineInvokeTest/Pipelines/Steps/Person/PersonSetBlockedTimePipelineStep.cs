@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-07-10 13:31
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-10 13:31
-// ***********************************************************************
-//  <copyright file="PersonSetBlockedTimePipelineStep.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PipelineInvokeTest.Models;
@@ -34,18 +18,14 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
 {
     public class PersonSetBlockedTimePipelineStep : PipeLineFlowStep<PersonDto>
     {
-        private static ILogger<PersonSetBlockedPipelineStep> _logger;
+        private readonly ILogger<PersonSetBlockedPipelineStep> _logger;
 
-        /// <inheritdoc />
         public override int ExecutionOrderIndex => 3;
 
-        /// <inheritdoc />
         public override bool IsEnabled => true;
 
-        /// <inheritdoc />
         public override PipelineExecutionCommandType ExecutionCommand => PipelineExecutionCommandType.Schedule;
 
-        /// <inheritdoc />
         public override PipelineFlowRetryPolicy RetrySchedulePolicy => new PipelineFlowRetryPolicy()
         {
             WaitSchedulerExecution = true,
@@ -58,27 +38,28 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
                 SuccessInterval = TimeSpan.FromMinutes(1)
             }
         };
-        
-        public PersonSetBlockedTimePipelineStep(IServiceProvider serviceProvider) 
-            => _logger = serviceProvider.GetRequiredService<ILogger<PersonSetBlockedPipelineStep>>();
 
-        /// <inheritdoc />
-        public override Func<PersonDto, Task<bool>> PreExecutionValidationAsync { get; protected set; }
-            = async currentObject =>
+        public PersonSetBlockedTimePipelineStep(IServiceProvider serviceProvider)
+        {
+            _logger = serviceProvider.GetRequiredService<ILogger<PersonSetBlockedPipelineStep>>();
+
+            PreExecutionValidationAsync = async (currentObject, cancellationToken) =>
             {
                 _logger.LogInformation($"Do pre-execution validation on step {nameof(PersonSetBlockedTimePipelineStep)}");
 
                 return await Task.FromResult(currentObject.IsBlocked.IsTrue());
             };
+        }
 
-        /// <inheritdoc />
+        public override Func<PersonDto, CancellationToken, Task<bool>> PreExecutionValidationAsync { get; protected set; }
+
         public override async Task<PipeLineStepResult<PersonDto>> ExecuteStepAsync(
             PersonDto pipelineStep,
             IPipelineFlowContext<PersonDto> context,
             ILogger<PipelineFlowInvoker<PersonDto>> logger,
             CancellationToken cancellationToken = default)
         {
-            //var result = PipeLineStepResult<PersonDto>.Instance;
+
             var result = new PipeLineStepResult<PersonDto>();
             result.SetState(PipelineStateType.Initialize);
             try
@@ -106,4 +87,3 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
         }
     }
 }
-

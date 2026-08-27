@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-07-14 14:25
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-14 14:25
-// ***********************************************************************
-//  <copyright file="DocSetFinishedPipelineStep.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PipelineInvokeTest.Enums;
@@ -36,8 +20,8 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
 {
     public class DocSetFinishedPipelineStep : PipeLineFlowStep<DocumentItemDto>
     {
-        private static IServiceProvider _serviceProvider;
-        private static ILogger<DocSetFinishedPipelineStep> _logger;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<DocSetFinishedPipelineStep> _logger;
 
         public DocSetFinishedPipelineStep(IServiceProvider serviceProvider)
         {
@@ -45,39 +29,35 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
             _logger = _serviceProvider.GetRequiredService<ILogger<DocSetFinishedPipelineStep>>();
         }
 
-        /// <inheritdoc />
         public override int ExecutionOrderIndex => 5;
 
-        /// <inheritdoc />
         public override bool IsEnabled => true;
 
-        /// <inheritdoc />
         public override PipelineExecutionCommandType ExecutionCommand => PipelineExecutionCommandType.Schedule;
 
-        /// <inheritdoc />
         public override PipelineFlowRetryPolicy RetrySchedulePolicy { get; protected set; }
             = new PipelineFlowRetryPolicy()
             {
                 WaitSchedulerExecution = true,
                 RetryIterations = 3,
+
                 ExecutionSchedulerSettings = new ScheduledJobOptions()
                 {
                     StopOnFailure = true,
                     ThrowOnFailure = false,
-                    FailInterval = TimeSpan.FromMinutes(1),
-                    SuccessInterval = TimeSpan.FromMinutes(0.5)
+                    FailInterval = TimeSpan.FromMilliseconds(40),
+                    SuccessInterval = TimeSpan.FromMilliseconds(20)
                 }
             };
 
-        /// <inheritdoc />
-        public override Func<DocumentItemDto, Task<bool>> PreExecutionValidationAsync
-            => async currentObject =>
+        public override Func<DocumentItemDto, CancellationToken, Task<bool>> PreExecutionValidationAsync
+            => async (currentObject, cancellationToken) =>
             {
                 _logger.LogInformation($"Do pre-execution validation on step {nameof(DocSetFinishedPipelineStep)}");
 
                 var service = _serviceProvider.GetRequiredService<DocumentService>();
 
-                var obj = await service.GetAsync(currentObject.Id);
+                var obj = await service.GetAsync(currentObject.Id, cancellationToken);
                 if (obj.IsNotNull() && obj.IsActive.IsTrue() && obj.Id.IsEmpty().IsFalse()
                     && obj.Status == DocStatusType.Approved && obj.State == DocStateType.OnProcessing)
                     return await Task.FromResult(true);
@@ -85,7 +65,6 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
                     return await Task.FromResult(false);
             };
 
-        /// <inheritdoc />
         public override async Task<PipeLineStepResult<DocumentItemDto>> ExecuteStepAsync(
             DocumentItemDto pipelineStep,
             IPipelineFlowContext<DocumentItemDto> context,
@@ -101,13 +80,13 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
 
                 if (PreExecutionValidationAsync.IsNotNull())
                 {
-                    var res = await PreExecutionValidationAsync.Invoke(pipelineStep);
+                    var res = await PreExecutionValidationAsync.Invoke(pipelineStep, cancellationToken);
                     if (res.IsFalse())
                     {
                         result.SetResult(pipelineStep, PipelineStatusType.Fail);
                         result.SetState(PipelineStateType.Finish);
                         result.SetMessage($"Pre-validation failed on step {nameof(DocSetFinishedPipelineStep)}.");
-                        
+
                         return await Task.FromResult(result.AsPipelineStepResult());
                     }
                 }
@@ -136,4 +115,3 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
         }
     }
 }
-

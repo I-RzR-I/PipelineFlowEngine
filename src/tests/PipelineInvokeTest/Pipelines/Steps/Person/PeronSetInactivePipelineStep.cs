@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-06-30 16:08
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-09 15:42
-// ***********************************************************************
-//  <copyright file="PeronSetInactivePipelineStep.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 #region U S A G E S
 
 using Microsoft.Extensions.Logging;
@@ -34,19 +18,15 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
 {
     public class PeronSetInactivePipelineStep : PipeLineFlowStep<PersonDto>
     {
-        /// <inheritdoc />
+
         public override int ExecutionOrderIndex => 1;
 
-        /// <inheritdoc />
         public override bool IsEnabled => true;
 
-        /// <inheritdoc />
         public override PipelineStateType State => PipelineStateType.Undefined;
 
-        /// <inheritdoc />
         public override PipelineStatusType Status => PipelineStatusType.Undefined;
 
-        /// <inheritdoc />
         public override async Task<PipeLineStepResult<PersonDto>> ExecuteStepAsync(
             PersonDto pipelineStep,
             IPipelineFlowContext<PersonDto> context,
@@ -54,7 +34,7 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
             CancellationToken cancellationToken = default)
         {
             var result = new PipeLineStepResult<PersonDto>();
-            //var result = PipeLineStepResult<PersonDto>.Instance;
+
             result.SetState(PipelineStateType.Initialize);
             try
             {

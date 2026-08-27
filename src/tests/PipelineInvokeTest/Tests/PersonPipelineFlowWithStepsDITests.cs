@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-06-30 15:37
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-09 15:42
-// ***********************************************************************
-//  <copyright file="PersonPipelineFlowWithStepsDITests.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 #region U S A G E S
 
 using Microsoft.Extensions.DependencyInjection;
@@ -28,9 +12,6 @@ using RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-// ReSharper disable RedundantArgumentDefaultValue
-// ReSharper disable InconsistentNaming
 
 #endregion
 
@@ -173,7 +154,7 @@ namespace PipelineInvokeTest.Tests
                 new List<Type>
                 {
                     typeof(PersonSetNamePipelineStep),
-                    typeof(PersonSetIdPipelineStep), 
+                    typeof(PersonSetIdPipelineStep),
                     typeof(PeronSetInactivePipelineStep),
                     typeof(PersonSetBlockedPipelineStep)
                 },
@@ -205,20 +186,23 @@ namespace PipelineInvokeTest.Tests
             _serviceCollection.RegisterPipelineFlowEngine<PersonDto, PersonPipelineContext>(ServiceLifetime.Scoped);
 
             _serviceCollection.AddPipelineFlowEngineSteps<PersonDto>(
-                new List<Type> 
-                { 
-                    typeof(PersonSetNamePipelineStep), 
-                    typeof(PersonSetIdPipelineStep), 
-                    typeof(PeronSetInactivePipelineStep), 
-                    typeof(PersonSetBlockedPipelineStep), 
+                new List<Type>
+                {
+                    typeof(PersonSetNamePipelineStep),
+                    typeof(PersonSetIdPipelineStep),
+                    typeof(PeronSetInactivePipelineStep),
+                    typeof(PersonSetBlockedPipelineStep),
                     typeof(PersonSetBlockedTimePipelineStep)
                 },
                 ServiceLifetime.Scoped);
 
             var localServiceProvider = _serviceCollection.BuildServiceProvider();
             var invoker = localServiceProvider.GetPipelineFlowEngineInvoker<PersonDto>();
+
+            var dateBeforeInvocation = DateTime.Now.Date;
             var result = await invoker.InvokeAsync(person);
-            
+            var dateAfterInvocation = DateTime.Now.Date;
+
             Assert.IsNotNull(result);
             Assert.IsTrue(result.IsSuccess);
             Assert.IsNotNull(result.FlowResponse);
@@ -228,7 +212,16 @@ namespace PipelineInvokeTest.Tests
             Assert.AreNotEqual(Guid.Empty, result.FlowResponse.Id);
             Assert.AreEqual(false, result.FlowResponse.IsActive);
             Assert.AreEqual(true, result.FlowResponse.IsBlocked);
-            Assert.AreEqual(DateTime.Now.Date, result.FlowResponse.BlockedOn);
+
+            Assert.AreNotEqual(default(DateTime), result.FlowResponse.BlockedOn,
+                "The blocked step must stamp a blocked date; a default value means it never ran.");
+            Assert.AreEqual(TimeSpan.Zero, result.FlowResponse.BlockedOn.TimeOfDay,
+                "The blocked date must be stamped as a date without a time component.");
+            Assert.IsTrue(
+                result.FlowResponse.BlockedOn >= dateBeforeInvocation
+                && result.FlowResponse.BlockedOn <= dateAfterInvocation,
+                $"The blocked date ({result.FlowResponse.BlockedOn:O}) must be the date the pipeline ran on, "
+                + $"between {dateBeforeInvocation:O} and {dateAfterInvocation:O}.");
         }
 
         [TestMethod]
@@ -240,12 +233,12 @@ namespace PipelineInvokeTest.Tests
             _serviceCollection.RegisterPipelineFlowEngine<PersonDto, PersonPipelineContext2>(ServiceLifetime.Scoped);
 
             _serviceCollection.AddPipelineFlowEngineSteps<PersonDto>(
-                new List<Type> 
-                { 
-                    typeof(PersonSetNamePipelineStep), 
-                    typeof(PersonSetIdPipelineStep), 
-                    typeof(PeronSetInactivePipelineStep), 
-                    typeof(PersonSetBlockedPipelineStep), 
+                new List<Type>
+                {
+                    typeof(PersonSetNamePipelineStep),
+                    typeof(PersonSetIdPipelineStep),
+                    typeof(PeronSetInactivePipelineStep),
+                    typeof(PersonSetBlockedPipelineStep),
                     typeof(PersonSetCreatedTimePipelineStep)
                 },
                 ServiceLifetime.Scoped);
@@ -253,7 +246,7 @@ namespace PipelineInvokeTest.Tests
             var localServiceProvider = _serviceCollection.BuildServiceProvider();
             var invoker = localServiceProvider.GetPipelineFlowEngineInvoker<PersonDto>();
             var result = await invoker.InvokeAsync(person);
-            
+
             Assert.IsNotNull(result);
             Assert.IsFalse(result.IsSuccess);
             Assert.IsNull(result.FlowResponse);
