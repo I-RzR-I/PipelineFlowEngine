@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-07-11 22:57
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-11 22:57
-// ***********************************************************************
-//  <copyright file="DocSetCreatedPipelineStep.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PipelineInvokeTest.Enums;
@@ -34,8 +18,8 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
 {
     public class DocSetCreatedPipelineStep : PipeLineFlowStep<DocumentItemDto>
     {
-        private static IServiceProvider _serviceProvider;
-        private static ILogger<DocSetCreatedPipelineStep> _logger;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<DocSetCreatedPipelineStep> _logger;
 
         public DocSetCreatedPipelineStep(IServiceProvider serviceProvider)
         {
@@ -43,31 +27,26 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
             _logger = _serviceProvider.GetRequiredService<ILogger<DocSetCreatedPipelineStep>>();
         }
 
-        /// <inheritdoc />
         public override int ExecutionOrderIndex => 1;
 
-        /// <inheritdoc />
         public override bool IsEnabled => true;
 
-        /// <inheritdoc />
         public override PipelineExecutionCommandType ExecutionCommand => PipelineExecutionCommandType.Simple;
 
-        /// <inheritdoc />
-        public override Func<DocumentItemDto, Task<bool>> PreExecutionValidationAsync
-        => async currentObject =>
+        public override Func<DocumentItemDto, CancellationToken, Task<bool>> PreExecutionValidationAsync
+        => async (currentObject, cancellationToken) =>
         {
             _logger.LogInformation($"Do pre-execution validation on step {nameof(DocSetCreatedPipelineStep)}");
 
             var service = _serviceProvider.GetRequiredService<DocumentService>();
 
-            var obj = await service.GetAsync(currentObject.Id);
+            var obj = await service.GetAsync(currentObject.Id, cancellationToken);
             if (obj.IsNotNull() && obj.IsActive.IsTrue() && obj.Id.IsEmpty().IsFalse())
                 return await Task.FromResult(true);
             else
                 return await Task.FromResult(false);
         };
 
-        /// <inheritdoc />
         public override async Task<PipeLineStepResult<DocumentItemDto>> ExecuteStepAsync(
             DocumentItemDto pipelineStep,
             IPipelineFlowContext<DocumentItemDto> context,
@@ -85,7 +64,7 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
                 pipelineStep.CreatedById = Guid.NewGuid();
                 pipelineStep.State = DocStateType.Created;
                 pipelineStep.Status = DocStatusType.New;
-                
+
                 result.SetResult(pipelineStep, PipelineStatusType.Success);
                 result.SetState(PipelineStateType.Finish);
                 result.SetMessage("Set created date and user.");
@@ -108,4 +87,3 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
         }
     }
 }
-

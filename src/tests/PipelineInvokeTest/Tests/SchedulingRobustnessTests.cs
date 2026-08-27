@@ -1,20 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly          : RzR.Shared.Services.PipelineInvokeTest
-//  Author            : RzR
-//  Created           : 19-06-2026 20:06
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 19-06-2026 21:52
-//  ***********************************************************************
-//  <copyright file="SchedulingRobustnessTests.cs" company="RzR SOFT & TECH">
-//      Copyright (c) RzR. All rights reserved.
-//  </copyright>
-//  <contact>
-//      https://iamrzr.dev/contact
-//  </contact>
-//  <summary></summary>
-//  ***********************************************************************
-
 #region U S I N G
 
 using Microsoft.Extensions.DependencyInjection;
@@ -28,8 +11,6 @@ using RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions;
 using System;
 using System.Threading.Tasks;
 
-// ReSharper disable InconsistentNaming
-
 #endregion
 
 namespace PipelineInvokeTest.Tests
@@ -42,8 +23,6 @@ namespace PipelineInvokeTest.Tests
         [TestInitialize]
         public void Init()
         {
-            AlwaysFailScheduledPipelineStep.ResetExecutionCount();
-
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<ILoggerFactory, LoggerFactory>();
             serviceCollection.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
@@ -55,18 +34,19 @@ namespace PipelineInvokeTest.Tests
         }
 
         [TestMethod]
-        public async Task ScheduledStep_WithStepRetryContext_TotalExecutionsAreBoundedByRetryIterations_NotAmplified()
+        public async Task ScheduledStep_WithStepRetryContext_ExecutesExactlyRetryIterationsTimes_NotAmplified()
         {
-            const int retryIterations = 3;
 
             var person = new PersonDto { Id = Guid.Empty, Name = "TestName", IsActive = true };
+            var scheduledStep = new AlwaysFailScheduledPipelineStep();
+
+            var expectedExecutions = scheduledStep.RetrySchedulePolicy.RetryIterations;
 
             _serviceCollection.RegisterPipelineFlowEngine<PersonDto, PersonPipelineContext2>();
 
-            _serviceCollection.AddPipelineFlowEngineStep<PersonDto, AlwaysFailScheduledPipelineStep>();
-
             var localServiceProvider = _serviceCollection.BuildServiceProvider();
             var invoker = localServiceProvider.GetPipelineFlowEngineInvoker<PersonDto>();
+            invoker.AddPipelineStep(scheduledStep);
 
             var result = await invoker.InvokeAsync(person);
 
@@ -78,15 +58,10 @@ namespace PipelineInvokeTest.Tests
             Assert.AreEqual(PipelineStatusType.Fail, result.Status,
                 "Pipeline Status must be Fail after the scheduler exhausts all iterations.");
 
-            var actualCount = AlwaysFailScheduledPipelineStep.ExecutionCount;
-
-            Assert.IsTrue(actualCount >= 1,
-                $"ExecuteStepAsync must have been called at least once; got {actualCount}.");
-            Assert.IsTrue(actualCount <= retryIterations,
-                $"Fix #5 bound violated: ExecutionCount ({actualCount}) exceeds RetryIterations ({retryIterations}). " +
-                $"The outer StepRetry loop must NOT re-schedule a scheduled step — total executions must be " +
-                $"<= {retryIterations} (the scheduler's own MaxIterations), not {retryIterations * (retryIterations + 1)} " +
-                $"(the pre-fix amplified value).");
+            Assert.AreEqual(expectedExecutions, scheduledStep.ExecutionCount,
+                $"A scheduled step must execute exactly RetryIterations ({expectedExecutions}) times. Fewer means " +
+                "the scheduler stopped before its budget was spent; more means the outer StepRetry loop " +
+                "re-scheduled an already scheduled step, multiplying every execution by the retry budget.");
         }
 
         [TestMethod]
@@ -135,7 +110,6 @@ namespace PipelineInvokeTest.Tests
             Assert.AreEqual(PipelineStatusType.Success, result.Status);
             Assert.AreEqual(PipelineStateType.Finish, result.State);
 
-            // Normal step mutation must be present
             Assert.IsNotNull(result.FlowResponse,
                 "FlowResponse must be populated by the normal step that ran before the dispatched step.");
             Assert.AreEqual("Person Name", result.FlowResponse.Name,

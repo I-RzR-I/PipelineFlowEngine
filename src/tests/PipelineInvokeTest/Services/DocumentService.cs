@@ -1,53 +1,45 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-07-11 19:50
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-11 19:50
-// ***********************************************************************
-//  <copyright file="DocumentService.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 using PipelineInvokeTest.Models;
 using RzR.Extensions.Domain.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PipelineInvokeTest.Services
 {
     public class DocumentService
     {
-        private static List<DocumentItemDto> Documents { get; set; }
+        private readonly List<DocumentItemDto> _documents;
 
         public DocumentService()
-            => Documents = new List<DocumentItemDto>();
-        
+            => _documents = new List<DocumentItemDto>();
+
         public async Task<DocumentItemDto> GetAsync(Guid id)
         {
             if (id.IsEmpty())
                 await Task.CompletedTask;
 
-            var docIdx = Documents.FindIndex(x => x.Id == id);
+            var docIdx = _documents.FindIndex(x => x.Id == id);
             if (docIdx != -1)
             {
-                return await Task.FromResult(Documents[docIdx]);
+                return await Task.FromResult(_documents[docIdx]);
             }
 
             return null;
         }
 
+        public async Task<DocumentItemDto> GetAsync(Guid id, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await GetAsync(id);
+        }
+
         public async Task AddAsync(DocumentItemDto document)
         {
-            if (Documents.Any(x => x.Id == document.Id).IsFalse())
-                Documents.Add(document);
+            if (_documents.Any(x => x.Id == document.Id).IsFalse())
+                _documents.Add(document);
 
             await Task.CompletedTask;
         }
@@ -57,14 +49,14 @@ namespace PipelineInvokeTest.Services
             if (document.IsNull())
                 await Task.CompletedTask;
 
-            var doc = Documents.FirstOrDefault(x => x.Id == document.Id);
+            var doc = _documents.FirstOrDefault(x => x.Id == document.Id);
             if (doc.IsNotNull())
             {
-                Documents.Remove(doc);
+                _documents.Remove(doc);
 
                 doc = document;
 
-                Documents.Add(doc);
+                _documents.Add(doc);
             }
 
             await Task.CompletedTask;
@@ -75,15 +67,14 @@ namespace PipelineInvokeTest.Services
             if (id.IsEmpty())
                 await Task.CompletedTask;
 
-            var docIdx = Documents.FindIndex(x => x.Id == id);
+            var docIdx = _documents.FindIndex(x => x.Id == id);
             if (docIdx != -1)
             {
-                var state = Documents[docIdx].IsActive;
-                Documents[docIdx].IsActive = state.Negate();
+                var state = _documents[docIdx].IsActive;
+                _documents[docIdx].IsActive = state.Negate();
             }
 
             await Task.CompletedTask;
         }
     }
 }
-

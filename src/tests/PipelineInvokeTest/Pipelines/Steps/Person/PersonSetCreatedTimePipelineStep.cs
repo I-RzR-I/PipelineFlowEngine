@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-07-11 15:26
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-11 15:26
-// ***********************************************************************
-//  <copyright file="PersonSetCreatedTimePipelineStep.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PipelineInvokeTest.Models;
@@ -32,18 +16,14 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
 {
     public class PersonSetCreatedTimePipelineStep : PipeLineFlowStep<PersonDto>
     {
-        private static ILogger<PersonSetCreatedTimePipelineStep> _logger;
+        private readonly ILogger<PersonSetCreatedTimePipelineStep> _logger;
 
-        /// <inheritdoc />
         public override int ExecutionOrderIndex => 4;
 
-        /// <inheritdoc />
         public override bool IsEnabled => true;
 
-        /// <inheritdoc />
         public override PipelineExecutionCommandType ExecutionCommand => PipelineExecutionCommandType.Simple;
 
-        /// <inheritdoc />
         public override PipelineFlowRetryPolicy RetrySchedulePolicy => new PipelineFlowRetryPolicy()
         {
             WaitSchedulerExecution = true,
@@ -60,7 +40,6 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
         public PersonSetCreatedTimePipelineStep(IServiceProvider serviceProvider)
             => _logger = serviceProvider.GetRequiredService<ILogger<PersonSetCreatedTimePipelineStep>>();
 
-        /// <inheritdoc />
         public override async Task<PipeLineStepResult<PersonDto>> ExecuteStepAsync(
             PersonDto pipelineStep,
             IPipelineFlowContext<PersonDto> context,
@@ -88,4 +67,3 @@ namespace PipelineInvokeTest.Pipelines.Steps.Person
         }
     }
 }
-

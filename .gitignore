@@ -269,5 +269,6 @@ Report/
 coverage.*
 
 # NCrunch
+.NCrunch*/
 *.ncrunchproject.user
 *.ncrunchsolution

@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-07-14 14:21
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-07-14 14:21
-// ***********************************************************************
-//  <copyright file="DocSetApprovedPipelineStep.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PipelineInvokeTest.Enums;
@@ -36,8 +20,8 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
 {
     public class DocSetApprovedPipelineStep : PipeLineFlowStep<DocumentItemDto>
     {
-        private static IServiceProvider _serviceProvider;
-        private static ILogger<DocSetApprovedPipelineStep> _logger;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<DocSetApprovedPipelineStep> _logger;
 
         public DocSetApprovedPipelineStep(IServiceProvider serviceProvider)
         {
@@ -45,40 +29,36 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
             _logger = _serviceProvider.GetRequiredService<ILogger<DocSetApprovedPipelineStep>>();
         }
 
-        /// <inheritdoc />
         public override int ExecutionOrderIndex => 4;
 
-        /// <inheritdoc />
         public override bool IsEnabled => true;
 
-        /// <inheritdoc />
         public override PipelineExecutionCommandType ExecutionCommand => PipelineExecutionCommandType.Schedule;
-        
-        /// <inheritdoc />
+
         public override PipelineFlowRetryPolicy RetrySchedulePolicy { get; protected set; }
             = new PipelineFlowRetryPolicy()
             {
                 StopExecutionIfSuccessful = true,
                 WaitSchedulerExecution = true,
                 RetryIterations = 2,
+
                 ExecutionSchedulerSettings = new ScheduledJobOptions()
                 {
                     StopOnFailure = true,
                     ThrowOnFailure = false,
-                    FailInterval = TimeSpan.FromMinutes(2),
-                    SuccessInterval = TimeSpan.FromMinutes(0.5)
+                    FailInterval = TimeSpan.FromMilliseconds(80),
+                    SuccessInterval = TimeSpan.FromMilliseconds(20)
                 }
             };
 
-        /// <inheritdoc />
-        public override Func<DocumentItemDto, Task<bool>> PreExecutionValidationAsync
-            => async currentObject =>
+        public override Func<DocumentItemDto, CancellationToken, Task<bool>> PreExecutionValidationAsync
+            => async (currentObject, cancellationToken) =>
             {
                 _logger.LogInformation($"Do pre-execution validation on step {nameof(DocSetApprovedPipelineStep)}");
 
                 var service = _serviceProvider.GetRequiredService<DocumentService>();
 
-                var obj = await service.GetAsync(currentObject.Id);
+                var obj = await service.GetAsync(currentObject.Id, cancellationToken);
                 if (obj.IsNotNull() && obj.IsActive.IsTrue() && obj.Id.IsEmpty().IsFalse()
                     && obj.Status == DocStatusType.OnApprove && obj.State == DocStateType.OnProcessing)
                     return await Task.FromResult(true);
@@ -86,7 +66,6 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
                     return await Task.FromResult(false);
             };
 
-        /// <inheritdoc />
         public override async Task<PipeLineStepResult<DocumentItemDto>> ExecuteStepAsync(
             DocumentItemDto pipelineStep,
             IPipelineFlowContext<DocumentItemDto> context,
@@ -100,7 +79,7 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
                 result.SetState(PipelineStateType.Run);
                 pipelineStep = pipelineStep.IfIsNull(new DocumentItemDto());
 
-                Thread.Sleep(TimeSpan.FromMinutes(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(25), cancellationToken).ConfigureAwait(false);
 
                 pipelineStep.ModifiedAt = DateTime.Now;
                 pipelineStep.ModifiedById = Guid.NewGuid();
@@ -128,4 +107,3 @@ namespace PipelineInvokeTest.Pipelines.Steps.Document
         }
     }
 }
-

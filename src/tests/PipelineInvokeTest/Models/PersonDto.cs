@@ -1,19 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.PipelineInvokeTest
-//  Author           : RzR
-//  Created On       : 2025-06-24 17:20
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2025-06-24 17:20
-// ***********************************************************************
-//  <copyright file="PersonDto.cs" company="RzR SOFT & TECH">
-//   Copyright © RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
 using System;
 
 namespace PipelineInvokeTest.Models

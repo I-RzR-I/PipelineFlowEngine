@@ -1,20 +1,3 @@
-﻿// ***********************************************************************
-//  Assembly          : RzR.Shared.Services.PipelineInvokeTest
-//  Author            : RzR
-//  Created           : 19-06-2026 19:06
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 19-06-2026 21:51
-//  ***********************************************************************
-//  <copyright file="ScheduledFireAndForgetTests.cs" company="RzR SOFT & TECH">
-//      Copyright (c) RzR. All rights reserved.
-//  </copyright>
-//  <contact>
-//      https://iamrzr.dev/contact
-//  </contact>
-//  <summary></summary>
-//  ***********************************************************************
-
 #region U S I N G
 
 using Microsoft.Extensions.DependencyInjection;
@@ -28,8 +11,6 @@ using RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-// ReSharper disable InconsistentNaming
 
 #endregion
 
