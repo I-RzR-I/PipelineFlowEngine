@@ -4,7 +4,7 @@
 //  Created On       : 2025-06-25 16:28
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2025-06-30 21:22
+//  Last Modified On : 2026-08-27 12:13
 // ***********************************************************************
 //  <copyright file="ServicePipelineStepExtensions.cs" company="RzR SOFT & TECH">
 //   Copyright © RzR. All rights reserved.
@@ -17,8 +17,11 @@
 #region U S A G E S
 
 using Microsoft.Extensions.DependencyInjection;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Extensions.Domain.Text;
 using RzR.PipelineFlowEngine.Abstractions;
 using RzR.PipelineFlowEngine.Extensions;
+using RzR.PipelineFlowEngine.Helpers;
 using RzR.PipelineFlowEngine.Pipeline;
 using System;
 using System.Collections.Generic;
@@ -80,13 +83,18 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
             ServiceLifetime stepLifetime = ServiceLifetime.Scoped)
             where TPipelineItem : class
         {
-            if (step.BaseType?.IsPipelineFlowStep<TPipelineItem>() == true)
+            if (step.IsPipelineFlowStepImplementation<TPipelineItem>().IsFalse())
             {
-                serviceCollection.Add(ServiceDescriptor.Describe(
-                    typeof(IPipelineFlowStep<TPipelineItem>),
-                    step,
-                    stepLifetime));
+                throw new ArgumentException(
+                    DefaultMessagesHelper.PipelineFlowStepRegistrationMessage.TypeIsNotPipelineStep.FormatWith(
+                        step?.FullName, typeof(TPipelineItem).FullName),
+                    nameof(step));
             }
+
+            serviceCollection.Add(ServiceDescriptor.Describe(
+                typeof(IPipelineFlowStep<TPipelineItem>),
+                step,
+                stepLifetime));
 
             return serviceCollection;
         }
@@ -111,13 +119,18 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
         {
             foreach (var step in steps)
             {
-                if (step.BaseType?.IsPipelineFlowStep<TPipelineItem>() == true)
+                if (step.IsPipelineFlowStepImplementation<TPipelineItem>().IsFalse())
                 {
-                    serviceCollection.Add(ServiceDescriptor.Describe(
-                        typeof(IPipelineFlowStep<TPipelineItem>),
-                        step,
-                        stepLifetime));
+                    throw new ArgumentException(
+                        DefaultMessagesHelper.PipelineFlowStepRegistrationMessage.TypeIsNotPipelineStep.FormatWith(
+                            step?.FullName, typeof(TPipelineItem).FullName),
+                        nameof(steps));
                 }
+
+                serviceCollection.Add(ServiceDescriptor.Describe(
+                    typeof(IPipelineFlowStep<TPipelineItem>),
+                    step,
+                    stepLifetime));
             }
 
             return serviceCollection;

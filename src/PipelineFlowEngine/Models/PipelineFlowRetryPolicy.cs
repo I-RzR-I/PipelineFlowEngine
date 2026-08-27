@@ -4,7 +4,7 @@
 //  Created On       : 2025-07-10 13:45
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2025-07-10 13:51
+//  Last Modified On : 2026-08-27 12:13
 // ***********************************************************************
 //  <copyright file="PipelineFlowRetryPolicy.cs" company="RzR SOFT & TECH">
 //   Copyright © RzR. All rights reserved.
@@ -61,6 +61,10 @@ namespace RzR.PipelineFlowEngine.Models
         ///     is set to the <seealso cref="PipelineStepFailExecutionStrategyType.StepRetry"/> flag.
         ///     Also is used when the pipeline flow step on <seealso cref="IPipelineFlowStep{T}.ExecutionCommand"/>
         ///     is set to the <seealso cref="PipelineExecutionCommandType.Schedule"/> flag to iterate schedule X times.
+        ///     A value of <c>0</c> is NOT a no-op in either role. A simple step under <c>StepRetry</c> becomes
+        ///     impossible to retry: it runs once and its first failure stops the pipeline. A scheduled step is
+        ///     rejected outright by the scheduler, which requires <c>MaxIterations</c> to be at least 1, and
+        ///     the pipeline fails without the step body ever running.
         /// </remarks>
         /// =================================================================================================
         public int RetryIterations { get; set; }
@@ -125,8 +129,8 @@ namespace RzR.PipelineFlowEngine.Models
         ///     If the parameter value is null, then object will be initialized with default values.
         /// </param>
         /// <param name="retryIterations">
-        ///     The retry iterations. 
-        ///     If the parameter value is null, default value will be 1.
+        ///     The retry iterations. Required, and never defaulted: the parameterless constructor applies the
+        ///     default of 1, this overload applies exactly the value supplied.
         /// </param>
         /// <param name="waitSchedulerExecution">
         ///     (Optional)

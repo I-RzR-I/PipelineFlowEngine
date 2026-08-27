@@ -4,7 +4,7 @@
 //  Created On       : 2025-06-23 23:37
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2025-06-23 23:40
+//  Last Modified On : 2026-08-27 12:13
 // ***********************************************************************
 //  <copyright file="PipeLineFlowStep.cs" company="RzR SOFT & TECH">
 //   Copyright © RzR. All rights reserved.
@@ -56,7 +56,11 @@ namespace RzR.PipelineFlowEngine.Pipeline
             = PipelineStateType.Undefined;
 
         /// <inheritdoc />
-        public virtual Func<T, Task<bool>> PreExecutionValidationAsync { get; protected set; }
+        public virtual Func<T, CancellationToken, Task<bool>> PreExecutionValidationAsync { get; protected set; }
+
+        /// <inheritdoc />
+        public virtual PipelineStepPreValidationFailStrategyType PreValidationFailStrategy { get; protected set; }
+            = PipelineStepPreValidationFailStrategyType.PipelineStop;
 
         /// <inheritdoc />
         public virtual PipelineExecutionCommandType ExecutionCommand { get; protected set; }

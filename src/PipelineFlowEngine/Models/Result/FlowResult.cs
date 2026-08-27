@@ -4,7 +4,7 @@
 //  Created On       : 2025-06-23 23:34
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2025-06-25 14:20
+//  Last Modified On : 2026-08-27 12:13
 // ***********************************************************************
 //  <copyright file="FlowResult.cs" company="RzR SOFT & TECH">
 //   Copyright © RzR. All rights reserved.
@@ -44,8 +44,12 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <summary>
         ///     Gets the flow response.
         /// </summary>
+        /// <remarks>
+        ///     On the invocation result the engine populates this only when the pipeline completed
+        ///     successfully; on a failed run it stays null.
+        /// </remarks>
         /// <value>
-        ///     The flow response.
+        ///     The processed object on a successful run, null otherwise.
         /// </value>
         /// =================================================================================================
         public T FlowResponse { get; private set; }

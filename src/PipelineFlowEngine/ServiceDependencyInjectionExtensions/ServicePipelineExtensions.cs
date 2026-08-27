@@ -4,7 +4,7 @@
 //  Created On       : 2025-06-25 18:28
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2025-06-25 21:13
+//  Last Modified On : 2026-08-27 12:13
 // ***********************************************************************
 //  <copyright file="ServicePipelineExtensions.cs" company="RzR SOFT & TECH">
 //   Copyright © RzR. All rights reserved.
@@ -18,6 +18,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using RzR.PipelineFlowEngine.Abstractions;
+using RzR.PipelineFlowEngine.Helpers;
 using RzR.PipelineFlowEngine.Pipeline;
 using RzR.Scheduling.RecurringJobs;
 using RzR.Scheduling.RecurringJobs.Abstractions;
@@ -62,7 +63,8 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
             switch (stepLifetime)
             {
                 case ServiceLifetime.Singleton:
-                    throw new NotSupportedException("PipelineFlowInvoker<T> holds mutable per-invocation state and cannot be registered as a Singleton. Use ServiceLifetime.Scoped or ServiceLifetime.Transient.");
+                    throw new NotSupportedException(
+                        DefaultMessagesHelper.PipelineFlowStepRegistrationMessage.SingletonLifetimeNotSupported);
                 case ServiceLifetime.Transient:
                     serviceCollection.AddTransient<PipelineFlowInvoker<TPipelineItem>>();
                     serviceCollection.AddTransient<IPipelineFlowContext<TPipelineItem>, TPersonPipelineContext>();
@@ -103,7 +105,8 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
             switch (stepLifetime)
             {
                 case ServiceLifetime.Singleton:
-                    throw new NotSupportedException("PipelineFlowInvoker<T> holds mutable per-invocation state and cannot be registered as a Singleton. Use ServiceLifetime.Scoped or ServiceLifetime.Transient.");
+                    throw new NotSupportedException(
+                        DefaultMessagesHelper.PipelineFlowStepRegistrationMessage.SingletonLifetimeNotSupported);
                 case ServiceLifetime.Transient:
                     serviceCollection.AddTransient<PipelineFlowInvoker<TPipelineItem>>();
                     serviceCollection.AddTransient<IPipelineFlowContext<TPipelineItem>, TPersonPipelineContext>();

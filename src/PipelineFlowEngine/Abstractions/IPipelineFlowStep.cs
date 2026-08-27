@@ -4,7 +4,7 @@
 //  Created On       : 2025-06-23 23:37
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2025-06-30 21:37
+//  Last Modified On : 2026-08-27 12:13
 // ***********************************************************************
 //  <copyright file="IPipelineFlowStep.cs" company="RzR SOFT & TECH">
 //   Copyright © RzR. All rights reserved.
@@ -80,12 +80,30 @@ namespace RzR.PipelineFlowEngine.Abstractions
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the pipeline step execute precondition asynchronous.
+        ///     The supplied <see cref="CancellationToken"/> is the very token passed to
+        ///     <c>PipelineFlowInvoker&lt;T&gt;.InvokeAsync</c>. A precondition that observes it and throws an
+        ///     <see cref="OperationCanceledException"/> cancels the whole pipeline and is NEVER converted
+        ///     into a validation failure. Preconditions must not catch
+        ///     <see cref="OperationCanceledException"/> and return false, otherwise a cancellation is
+        ///     reported as a business rejection.
         /// </summary>
         /// <value>
         ///     The pipeline step execute precondition.
         /// </value>
         /// =================================================================================================
-        Func<T, Task<bool>> PreExecutionValidationAsync { get; }
+        Func<T, CancellationToken, Task<bool>> PreExecutionValidationAsync { get; }
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     Gets the pipeline step pre-validation fail strategy applied when
+        ///     <see cref="PreExecutionValidationAsync"/> returns false.
+        ///     See the <seealso cref="PipelineStepPreValidationFailStrategyType"/> definition.
+        /// </summary>
+        /// <value>
+        ///     The pipeline step pre-validation fail strategy.
+        /// </value>
+        /// =================================================================================================
+        PipelineStepPreValidationFailStrategyType PreValidationFailStrategy { get; }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
