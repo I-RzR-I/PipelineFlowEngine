@@ -17,11 +17,9 @@
 
 namespace RzR.PipelineFlowEngine.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Values that represent the terminal status of a fire-and-forget dispatched pipeline step.
     /// </summary>
-    /// =================================================================================================
     public enum PipelineDispatchStatusType
     {
         /// <summary>

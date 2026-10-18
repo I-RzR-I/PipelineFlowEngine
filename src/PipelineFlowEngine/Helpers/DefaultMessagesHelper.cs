@@ -16,20 +16,16 @@
 
 namespace RzR.PipelineFlowEngine.Helpers
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A default messages helper.
     /// </summary>
-    /// =================================================================================================
     internal static class DefaultMessagesHelper
     {
         internal const string FormatEventLog = "['{0}'] - {1}";
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A flow result event messages.
         /// </summary>
-        /// =================================================================================================
         internal static class FlowResultEventMessage
         {
             internal const string SetSuccess = "['{0}'] - Set flow success";
@@ -42,11 +38,9 @@ namespace RzR.PipelineFlowEngine.Helpers
             internal const string SetState = "['{0}'] - Changed flow state from ['{1}'] => ['{2}']";
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A pipeline flow step registration messages.
         /// </summary>
-        /// =================================================================================================
         internal static class PipelineFlowStepRegistrationMessage
         {
             internal const string TypeIsNotPipelineStep = "The type ['{0}'] is not an instantiable implementation of the pipeline step contract for the pipeline item type ['{1}']!";
@@ -54,11 +48,9 @@ namespace RzR.PipelineFlowEngine.Helpers
             internal const string SingletonLifetimeNotSupported = "PipelineFlowInvoker<T> holds mutable per-invocation state and cannot be registered as a Singleton. Use ServiceLifetime.Scoped or ServiceLifetime.Transient.";
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A pipeline flow invoker messages.
         /// </summary>
-        /// =================================================================================================
         internal static class PipelineFlowInvokerMessage
         {
             internal const string NoPipelineSteps = "Execution pipeline step list is empty!";

@@ -29,59 +29,49 @@ using System.Threading.Tasks;
 
 namespace RzR.PipelineFlowEngine.Abstractions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Interface for pipeline flow step.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
-    /// =================================================================================================
     public interface IPipelineFlowStep<T> where T : class
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the zero-based index of the pipeline step execution order.
         /// </summary>
         /// <value>
         ///     The pipeline step execution order index.
         /// </value>
-        /// =================================================================================================
         int ExecutionOrderIndex { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets a value indicating whether this pipeline step is enabled.
         /// </summary>
         /// <value>
         ///     True if this pipeline step is enabled, false if not.
         /// </value>
-        /// =================================================================================================
         bool IsEnabled { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the pipeline step state.
         /// </summary>
         /// <value>
         ///     The pipeline step state.
         /// </value>
-        /// =================================================================================================
         PipelineStateType State { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the pipeline step status.
         /// </summary>
         /// <value>
         ///     The pipeline step status.
         /// </value>
-        /// =================================================================================================
         PipelineStatusType Status { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets the pipeline step execute precondition asynchronous.
-        ///     The supplied <see cref="CancellationToken"/> is the very token passed to
-        ///     <c>PipelineFlowInvoker&lt;T&gt;.InvokeAsync</c>. A precondition that observes it and throws an
+        ///     Gets the pipeline step execute precondition asynchronous. The supplied <see cref="CancellationToken"/>
+        ///     is the very token passed to
+        ///     <c>PipelineFlowInvoker&lt;T&gt;.InvokeAsync</c>. A precondition that observes it and
+        ///     throws an
         ///     <see cref="OperationCanceledException"/> cancels the whole pipeline and is NEVER converted
         ///     into a validation failure. Preconditions must not catch
         ///     <see cref="OperationCanceledException"/> and return false, otherwise a cancellation is
@@ -90,10 +80,8 @@ namespace RzR.PipelineFlowEngine.Abstractions
         /// <value>
         ///     The pipeline step execute precondition.
         /// </value>
-        /// =================================================================================================
         Func<T, CancellationToken, Task<bool>> PreExecutionValidationAsync { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the pipeline step pre-validation fail strategy applied when
         ///     <see cref="PreExecutionValidationAsync"/> returns false.
@@ -102,31 +90,25 @@ namespace RzR.PipelineFlowEngine.Abstractions
         /// <value>
         ///     The pipeline step pre-validation fail strategy.
         /// </value>
-        /// =================================================================================================
         PipelineStepPreValidationFailStrategyType PreValidationFailStrategy { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets the pipeline step 'execution' command type.
-        ///     See the <seealso cref="PipelineExecutionCommandType"/> definition.
+        ///     Gets the pipeline step 'execution' command type. See the <seealso cref="PipelineExecutionCommandType"/>
+        ///     definition.
         /// </summary>
         /// <value>
         ///     The pipeline step 'execution' command.
         /// </value>
-        /// =================================================================================================
         PipelineExecutionCommandType ExecutionCommand { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the pipeline step retry schedule policy.
         /// </summary>
         /// <value>
         ///     The pipeline step retry schedule policy.
         /// </value>
-        /// =================================================================================================
         PipelineFlowRetryPolicy RetrySchedulePolicy { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Executes the pipeline step asynchronous operation.
         /// </summary>
@@ -139,7 +121,6 @@ namespace RzR.PipelineFlowEngine.Abstractions
         /// <returns>
         ///     The pipeline execute step.
         /// </returns>
-        /// =================================================================================================
         Task<PipeLineStepResult<T>> ExecuteStepAsync(
             T pipelineStep,
             IPipelineFlowContext<T> context,

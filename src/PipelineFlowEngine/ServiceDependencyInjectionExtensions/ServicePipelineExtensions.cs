@@ -30,17 +30,17 @@ using System.Linq;
 
 namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A service pipeline flow engine extensions.
     /// </summary>
-    /// =================================================================================================
     public static class ServicePipelineExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An IServiceCollection extension method that registers the pipeline.
         /// </summary>
+        /// <exception cref="NotSupportedException">
+        ///     Thrown when the requested operation is not supported.
+        /// </exception>
         /// <typeparam name="TPipelineItem">Type of the pipeline item.</typeparam>
         /// <typeparam name="TPersonPipelineContext">Type of the person pipeline context.</typeparam>
         /// <param name="serviceCollection">The serviceCollection to act on.</param>
@@ -49,7 +49,6 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
         /// <returns>
         ///     An IServiceCollection.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection RegisterPipelineFlowEngine<TPipelineItem, TPersonPipelineContext>(
             this IServiceCollection serviceCollection,
             IEnumerable<Type> steps,
@@ -81,10 +80,12 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
             return serviceCollection;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An IServiceCollection extension method that registers the pipeline.
         /// </summary>
+        /// <exception cref="NotSupportedException">
+        ///     Thrown when the requested operation is not supported.
+        /// </exception>
         /// <typeparam name="TPipelineItem">Type of the pipeline item.</typeparam>
         /// <typeparam name="TPersonPipelineContext">Type of the person pipeline context.</typeparam>
         /// <param name="serviceCollection">The serviceCollection to act on.</param>
@@ -92,7 +93,6 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
         /// <returns>
         ///     An IServiceCollection.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection RegisterPipelineFlowEngine<TPipelineItem, TPersonPipelineContext>(
             this IServiceCollection serviceCollection,
             ServiceLifetime stepLifetime = ServiceLifetime.Scoped)

@@ -16,11 +16,9 @@
 
 namespace RzR.PipelineFlowEngine.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Values that represent pipeline step execution strategy types.
     /// </summary>
-    /// =================================================================================================
     public enum PipelineStepExecutionStrategyType
     {
         /// <summary>

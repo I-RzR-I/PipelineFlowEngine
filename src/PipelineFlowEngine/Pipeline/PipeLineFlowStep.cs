@@ -32,13 +32,11 @@ using System.Threading.Tasks;
 
 namespace RzR.PipelineFlowEngine.Pipeline
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A pipeline flow step.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
     /// <seealso cref="T:PipelineFlowEngine.Abstractions.IPipelineFlowStep{T}"/>
-    /// =================================================================================================
     public abstract class PipeLineFlowStep<T> : IPipelineFlowStep<T> where T : class
     {
         /// <inheritdoc/>

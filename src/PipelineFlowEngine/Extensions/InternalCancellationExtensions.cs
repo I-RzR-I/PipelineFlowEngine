@@ -24,14 +24,11 @@ using System.Threading;
 
 namespace RzR.PipelineFlowEngine.Extensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An internal cancellation extensions.
     /// </summary>
-    /// =================================================================================================
     internal static class InternalCancellationExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An <see cref="OperationCanceledException" /> extension method that query if the current
         ///     exception represents a cancellation of the pipeline itself, and therefore must be re-
@@ -44,7 +41,6 @@ namespace RzR.PipelineFlowEngine.Extensions
         /// <returns>
         ///     True if the pipeline itself was cancelled, false if not.
         /// </returns>
-        /// =================================================================================================
         internal static bool IsPipelineCancellation(this OperationCanceledException exception,
             CancellationToken pipelineToken)
         {

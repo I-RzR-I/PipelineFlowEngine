@@ -42,96 +42,71 @@ using PipeInvokeMessage = RzR.PipelineFlowEngine.Helpers.DefaultMessagesHelper.P
 
 namespace RzR.PipelineFlowEngine.Pipeline
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A pipeline flow invoker. This class cannot be inherited.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
-    /// =================================================================================================
     public sealed class PipelineFlowInvoker<T> where T : class
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the pipeline flow context.
         /// </summary>
-        /// =================================================================================================
         private readonly IPipelineFlowContext<T> _context;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the logger.
         /// </summary>
-        /// =================================================================================================
         private readonly ILogger<PipelineFlowInvoker<T>> _logger;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the pipeline flow events.
         /// </summary>
-        /// =================================================================================================
         private readonly ICollection<PipelineFlowEvent> _events;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the pipeline flow step results.
         /// </summary>
-        /// =================================================================================================
         private readonly ICollection<PipelineFlowStepResult<T>> _stepResults;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the pipeline flow steps defined for force execute.
         /// </summary>
-        /// =================================================================================================
         private readonly ICollection<IPipelineFlowStep<T>> _stepsForceExecute;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the pipeline flow steps defined for priority execute.
         /// </summary>
-        /// =================================================================================================
         private readonly ICollection<IPipelineFlowStep<T>> _stepsPriorityExecute;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the method scheduler used to run scheduled pipeline steps.
         /// </summary>
-        /// =================================================================================================
         private readonly IMethodScheduler _methodScheduler;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the pipeline flow steps registered for queued execution.
         /// </summary>
-        /// =================================================================================================
         private readonly ICollection<IPipelineFlowStep<T>> _stepsQueued;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the service scope factory used to run fire-and-forget scheduled steps in
         ///     their own scope. Optional; when null a dispatched step keeps running against the scope
         ///     that resolved it.
         /// </summary>
-        /// =================================================================================================
         private readonly IServiceScopeFactory _scopeFactory;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the observer notified when a fire-and-forget dispatched step reaches a
         ///     terminal state. Optional; when null no dispatch outcome is reported.
         /// </summary>
-        /// =================================================================================================
         private readonly IPipelineDispatchObserver<T> _dispatchObserver;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     The reentrancy guard flag of the current invoker. A value of <c>1</c> means an
-        ///     invocation is already running on this instance.
+        ///     The reentrancy guard flag of the current invoker. A value of <c>1</c> means an invocation
+        ///     is already running on this instance.
         /// </summary>
-        /// =================================================================================================
         private int _invocationInProgress;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="PipelineFlowInvoker{T}"/> class.
         /// </summary>
@@ -155,7 +130,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         ///     outcome is reported and the failure of a dispatched step stays visible through the logger
         ///     only.
         /// </param>
-        /// =================================================================================================
         public PipelineFlowInvoker(
             IPipelineFlowContext<T> context,
             ILogger<PipelineFlowInvoker<T>> logger,
@@ -177,7 +151,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             _stepsPriorityExecute = new List<IPipelineFlowStep<T>>();
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Adds a pipeline step to the pipeline flow context.
         /// </summary>
@@ -185,7 +158,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <param name="stepExecutionStrategy">
         ///     (Optional) The step execution strategy. Default value is <seealso cref="PipelineStepExecutionStrategyType.AddInQueue"/>
         /// </param>
-        /// =================================================================================================
         public void AddPipelineStep(
             IPipelineFlowStep<T> step,
             PipelineStepExecutionStrategyType stepExecutionStrategy = PipelineStepExecutionStrategyType.AddInQueue)
@@ -205,7 +177,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Adds a pipeline steps to the pipeline flow context.
         /// </summary>
@@ -225,7 +196,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <param name="stepsType">
         ///     A variable-length parameters list containing pipeline flow steps type.
         /// </param>
-        /// =================================================================================================
         public void AddPipelineSteps(
             PipelineStepExecutionStrategyType stepExecutionStrategy = PipelineStepExecutionStrategyType.AddInQueue,
             params Type[] stepsType)
@@ -247,17 +217,15 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Adds a pipeline steps to the pipeline flow context.
         /// </summary>
-        /// <param name="steps">A variable-length parameters list containing pipeline flow steps.</param>
         /// <exception cref="ArgumentException">
-        ///     Thrown when one of the supplied entries is null or does not supply a step instance. Such an
-        ///     entry is rejected instead of being skipped, because a silently dropped step would let the
-        ///     pipeline report success for work that never ran.
+        ///     Thrown when one of the supplied entries is null or does not supply a step instance. Such
+        ///     an entry is rejected instead of being skipped, because a silently dropped step would let
+        ///     the pipeline report success for work that never ran.
         /// </exception>
-        /// =================================================================================================
+        /// <param name="steps">A variable-length parameters list containing pipeline flow steps.</param>
         public void AddPipelineSteps(params AddPipelineStep<T>[] steps)
         {
             if (steps.IsNullOrEmptyEnumerable())
@@ -277,7 +245,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Executes/Invoke the pipeline steps and return the execution result.
         /// </summary>
@@ -300,7 +267,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <returns>
         ///     The pipeline invoke result.
         /// </returns>
-        /// =================================================================================================
         public async Task<PipeLineResult<T>> InvokeAsync(T pipelineItem,
             CancellationToken cancellationToken = default)
         {
@@ -320,7 +286,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Executes the pipeline steps once the reentrancy guard was acquired and the per-invocation
         ///     state was reset.
@@ -333,7 +298,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <returns>
         ///     The pipeline invoke result.
         /// </returns>
-        /// =================================================================================================
         private async Task<PipeLineResult<T>> InvokePipelineAsync(T pipelineItem,
             CancellationToken cancellationToken)
         {
@@ -650,20 +614,18 @@ namespace RzR.PipelineFlowEngine.Pipeline
             return result.AsPipelineResult();
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds the ordered collection of steps to execute, applying the registered execution
         ///     strategies.
         /// </summary>
         /// <remarks>
-        ///     A non-empty force-execute bucket REPLACES the whole execution set. A non-empty 
-        ///     priority-execute bucket is PREPENDED to the queued bucket, each bucket ordered on its own and
+        ///     A non-empty force-execute bucket REPLACES the whole execution set. A non-empty priority-
+        ///     execute bucket is PREPENDED to the queued bucket, each bucket ordered on its own and
         ///     never globally, so a queued step never interleaves ahead of a priority one.
         /// </remarks>
         /// <returns>
         ///     The ordered pipeline flow steps to execute.
         /// </returns>
-        /// =================================================================================================
         private ICollection<IPipelineFlowStep<T>> BuildExecutionSteps()
         {
             if (_stepsForceExecute.IsNullOrEmptyEnumerable().IsFalse())
@@ -682,7 +644,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             return _stepsQueued.FilterEnabledOrdered();
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Maps a pipeline retry policy onto the scheduler options used to schedule a step.
         /// </summary>
@@ -690,7 +651,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <returns>
         ///     The scheduled job options describing how the step must be scheduled.
         /// </returns>
-        /// =================================================================================================
         private static ScheduledJobOptions BuildScheduledJobOptions(PipelineFlowRetryPolicy scheduleRetryPolicy)
         {
             var settings = scheduleRetryPolicy.ExecutionSchedulerSettings.IfIsNull(new ScheduledJobOptions());
@@ -714,7 +674,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             return options;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Completes the invocation result as a terminal pipeline failure.
         /// </summary>
@@ -730,7 +689,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <returns>
         ///     The failed pipeline invoke result.
         /// </returns>
-        /// =================================================================================================
         private PipeLineResult<T> FailPipeline(PipeLineResult<T> result, string message = null)
         {
             result.SetStepResults(_stepResults);
@@ -744,24 +702,24 @@ namespace RzR.PipelineFlowEngine.Pipeline
                 .AsPipelineResult();
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Resolves the equivalent of an already registered step from a freshly created service scope.
+        ///     Resolves the equivalent of an already registered step from a freshly created service
+        ///     scope.
         /// </summary>
         /// <remarks>
         ///     Steps are registered with <see cref="IPipelineFlowStep{T}"/> as the service type and the
-        ///     concrete class as the implementation, so they cannot be resolved by their concrete type; the
-        ///     registrations of the scope are enumerated and matched on the runtime type instead. A step
-        ///     supplied as a constructed instance was never in the container and therefore never matches; it
-        ///     is returned unchanged, keeping the dependencies it was constructed with.
+        ///     concrete class as the implementation, so they cannot be resolved by their concrete type;
+        ///     the registrations of the scope are enumerated and matched on the runtime type instead. A
+        ///     step supplied as a constructed instance was never in the container and therefore never
+        ///     matches; it is returned unchanged, keeping the dependencies it was constructed with.
+        /// 
         /// </remarks>
         /// <param name="scope">The service scope created for the dispatched execution.</param>
         /// <param name="registeredStep">The step instance held by this invoker.</param>
         /// <returns>
-        ///     The step resolved from <paramref name="scope"/>, or <paramref name="registeredStep"/> when the
-        ///     scope has no registration for it.
+        ///     The step resolved from <paramref name="scope"/>, or <paramref name="registeredStep"/>
+        ///     when the scope has no registration for it.
         /// </returns>
-        /// =================================================================================================
         private IPipelineFlowStep<T> ResolveScopedStep(IServiceScope scope, IPipelineFlowStep<T> registeredStep)
         {
             var stepType = registeredStep.GetType();
@@ -779,7 +737,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             return registeredStep;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Handles a scheduled step that was dispatched without waiting for its execution: keeps the
         ///     cancellation registration alive for the job lifetime only, logs a faulted dispatch, and
@@ -789,11 +746,10 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <param name="job">The scheduled job running the step.</param>
         /// <param name="cancellationToken">A token that allows processing to be cancelled.</param>
         /// <param name="executionState">
-        ///     The state written by the work delegate of the dispatched execution. Read only once the job
-        ///     completed, to tell a job that finished without ever running the step apart from one that
-        ///     ran it, and from one whose body threw while the scheduler absorbed the failure.
+        ///     The state written by the work delegate of the dispatched execution. Read only once the
+        ///     job completed, to tell a job that finished without ever running the step apart from one
+        ///     that ran it, and from one whose body threw while the scheduler absorbed the failure.
         /// </param>
-        /// =================================================================================================
         private void DispatchScheduledStep(IPipelineFlowStep<T> step, IScheduledJob job,
             CancellationToken cancellationToken, ScheduledExecutionState executionState)
         {
@@ -854,7 +810,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Runs one iteration of a scheduled step body and records on the execution state what that
         ///     iteration did.
@@ -864,11 +819,12 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <param name="step">The step whose body is executed.</param>
         /// <param name="pipelineItem">The pipeline flow item.</param>
         /// <param name="context">The flow context handed to the step body.</param>
-        /// <param name="cancellationToken">The token supplied by the scheduler for this iteration.</param>
+        /// <param name="cancellationToken">
+        ///     The token supplied by the scheduler for this iteration.
+        /// </param>
         /// <returns>
         ///     The step result produced by the body.
         /// </returns>
-        /// =================================================================================================
         private async Task<PipeLineStepResult<T>> ExecuteScheduledBodyAsync(
             ScheduledExecutionState executionState,
             IPipelineFlowStep<T> step,
@@ -894,10 +850,9 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Creates the service scope of a dispatched execution and resolves the step and flow context
-        ///     from it, recording a failure of that setup on the execution state.
+        ///     Creates the service scope of a dispatched execution and resolves the step and flow
+        ///     context from it, recording a failure of that setup on the execution state.
         /// </summary>
         /// <exception cref="Exception">Rethrows whatever the resolution raised.</exception>
         /// <param name="executionState">The state of the current scheduled execution.</param>
@@ -905,7 +860,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <returns>
         ///     The created scope together with the step and flow context resolved from it.
         /// </returns>
-        /// =================================================================================================
         private (IServiceScope Scope, IPipelineFlowStep<T> Step, IPipelineFlowContext<T> Context) ResolveDispatchScope(
             ScheduledExecutionState executionState, IPipelineFlowStep<T> registeredStep)
         {
@@ -928,7 +882,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Registers a stop of the scheduled job against the pipeline cancellation, reporting a stop
         ///     that fails either way it can fail.
@@ -939,7 +892,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <returns>
         ///     The registration, which the caller must dispose once the job no longer needs stopping.
         /// </returns>
-        /// =================================================================================================
         private CancellationTokenRegistration RegisterStopOnCancellation(IScheduledJob job, string stepName,
             CancellationToken cancellationToken)
             => cancellationToken.Register(() =>
@@ -963,18 +915,19 @@ namespace RzR.PipelineFlowEngine.Pipeline
                 }
             });
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Classifies the terminal outcome of a dispatched execution from the completed job task and the
-        ///     state its work delegate left behind.
+        ///     Classifies the terminal outcome of a dispatched execution from the completed job task and
+        ///     the state its work delegate left behind.
         /// </summary>
         /// <param name="completion">The completed job task of the dispatched execution.</param>
-        /// <param name="executionState">The state written by the work delegate of the dispatched execution.</param>
+        /// <param name="executionState">
+        ///     The state written by the work delegate of the dispatched execution.
+        /// </param>
         /// <param name="cancellationToken">The token supplied to the pipeline invocation.</param>
         /// <returns>
-        ///     The terminal dispatch status and the exception that goes with it, or null when there is none.
+        ///     The terminal dispatch status and the exception that goes with it, or null when there is
+        ///     none.
         /// </returns>
-        /// =================================================================================================
         private static (PipelineDispatchStatusType Status, Exception Error) ClassifyDispatch(Task completion,
             ScheduledExecutionState executionState, CancellationToken cancellationToken)
         {
@@ -1002,17 +955,15 @@ namespace RzR.PipelineFlowEngine.Pipeline
             return (PipelineDispatchStatusType.NotObserved, null);
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Reports the terminal outcome of a dispatched (fire-and-forget) step to the registered
         ///     dispatch observer, if any.
         /// </summary>
         /// <param name="stepName">The runtime type name of the dispatched step.</param>
         /// <param name="dispatch">
-        ///     The already classified terminal status of the dispatch and the exception that goes with it.
-        ///     The status is never re-derived here, so the observer and the logger always agree.
+        ///     The already classified terminal status of the dispatch and the exception that goes with
+        ///     it. The status is never re-derived here, so the observer and the logger always agree.
         /// </param>
-        /// =================================================================================================
         private void RaiseDispatchCompleted(string stepName,
             (PipelineDispatchStatusType Status, Exception Error) dispatch)
         {
@@ -1048,19 +999,18 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Logs empty step data on the invocation result.
         /// </summary>
         /// <remarks>
         ///     The caller's <paramref name="result"/> instance is completed in place instead of a new
-        ///     one being returned, otherwise the state-transition events already recorded on it are lost. 
+        ///     one being returned, otherwise the state-transition events already recorded on it are lost.
+        /// 
         /// </remarks>
         /// <param name="result">The result of the current invocation.</param>
         /// <returns>
         ///     A PipeLineResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         private PipeLineResult<T> LogEmptyStepData(PipeLineResult<T> result)
         {
             SetLogAndEvent(LogLevel.Error, PipeInvokeMessage.NoPipelineSteps);
@@ -1074,7 +1024,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
                 .AsPipelineResult();
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Executes the pre execution validation asynchronous operation.
         /// </summary>
@@ -1086,12 +1035,12 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <param name="cancellationToken">A token that allows processing to be cancelled.</param>
         /// <returns>
         ///     The validation outcome, the message describing why the pipeline must stop, and whether
-        ///     the failure is eligible for <see cref="PipelineStepPreValidationFailStrategyType.StepSkip"/>.
-        ///     A precondition that threw is reported with a different message than one that returned
+        ///     the failure is eligible for <see cref="PipelineStepPreValidationFailStrategyType.StepSkip"/>
+        ///     . A precondition that threw is reported with a different message than one that returned
         ///     false, so the two remain distinguishable on the result and in the event stream, and is
-        ///     never skippable: a precondition that cannot be evaluated always halts the pipeline. 
+        ///     never skippable: a precondition that cannot be evaluated always halts the pipeline.
+        /// 
         /// </returns>
-        /// =================================================================================================
         private async Task<(bool IsValid, string StopMessage, bool CanSkipStep)> DoPreExecutionValidationAsync(
             Func<T, CancellationToken, Task<bool>> executePrecondition, T currentObject, CancellationToken cancellationToken)
         {
@@ -1118,7 +1067,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Converts an exception thrown by a pipeline step into a failed step result, so the
         ///     configured
@@ -1129,7 +1077,6 @@ namespace RzR.PipelineFlowEngine.Pipeline
         /// <returns>
         ///     A failed PipeLineStepResult&lt;T&gt; carrying the originating exception message.
         /// </returns>
-        /// =================================================================================================
         private PipeLineStepResult<T> BuildFailedStepResult(IPipelineFlowStep<T> step, Exception stepException)
         {
             SetLogAndEvent(LogLevel.Warning,
@@ -1142,14 +1089,12 @@ namespace RzR.PipelineFlowEngine.Pipeline
             return failedStepResult;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets log and event.
         /// </summary>
         /// <param name="level">The level.</param>
         /// <param name="message">The message.</param>
         /// <param name="exception">(Optional) The exception.</param>
-        /// =================================================================================================
         private void SetLogAndEvent(LogLevel level, string message, Exception exception = null)
         {
             _logger.IfEnabledWrite(level, message, exception);
@@ -1157,19 +1102,18 @@ namespace RzR.PipelineFlowEngine.Pipeline
                 DefaultMessagesHelper.FormatEventLog.FormatWith(this.GetType().GetFlowName(), message), exception));
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets log and event, tagging the log entry with a stable event identifier.
         /// </summary>
         /// <remarks>
         ///     The flow event carries no identifier: only the logger entry does, because the identifier
         ///     exists for sinks and alert rules that match on a number instead of on message text.
+        /// 
         /// </remarks>
         /// <param name="level">The level.</param>
         /// <param name="eventId">The stable event identifier of the log entry.</param>
         /// <param name="message">The message.</param>
         /// <param name="exception">(Optional) The exception.</param>
-        /// =================================================================================================
         private void SetLogAndEvent(LogLevel level, EventId eventId, string message, Exception exception = null)
         {
             _logger.IfEnabledWrite(level, eventId, message, exception);

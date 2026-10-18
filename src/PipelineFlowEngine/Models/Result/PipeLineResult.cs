@@ -23,37 +23,29 @@ using System.Collections.Generic;
 
 namespace RzR.PipelineFlowEngine.Models.Result
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Encapsulates the result of a pipeline. This class cannot be inherited.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
     /// <seealso cref="T:PipelineFlowEngine.Models.Result.FlowResult{T}"/>
-    /// =================================================================================================
     public sealed class PipeLineResult<T> : FlowResult<T> where T : class
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable) the step results.
         /// </summary>
-        /// =================================================================================================
         private readonly List<PipelineFlowStepResult<T>> _stepResults = new List<PipelineFlowStepResult<T>>();
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the step results.
         /// </summary>
         /// <value>
         ///     The step results.
         /// </value>
-        /// =================================================================================================
         public IEnumerable<PipelineFlowStepResult<T>> StepResults => _stepResults;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="PipeLineResult{T}"/> class.
         /// </summary>
-        /// =================================================================================================
         public PipeLineResult() { }
 
         /// -------------------------------------------------------------------------------------------------
@@ -65,29 +57,24 @@ namespace RzR.PipelineFlowEngine.Models.Result
         public PipeLineResult(IEnumerable<PipelineFlowStepResult<T>> stepResults)
             => _stepResults.AddRange(stepResults);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the success.
         /// </summary>
         /// <returns>
         ///     A PipeLineResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public static PipeLineResult<T> Success()
             => new PipeLineResult<T>().SetSuccess().AsPipelineResult<T>();
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the failure.
         /// </summary>
         /// <returns>
         ///     A PipeLineResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public static PipeLineResult<T> Failure()
             => new PipeLineResult<T>().SetFailure().AsPipelineResult<T>();
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Appends a step result.
         /// </summary>
@@ -95,7 +82,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A PipeLineResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public PipeLineResult<T> AppendStepResult(PipelineFlowStepResult<T> stepResult)
         {
             _stepResults.Add(stepResult);
@@ -103,7 +89,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets step results.
         /// </summary>
@@ -111,7 +96,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A PipeLineResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public PipeLineResult<T> SetStepResults(IEnumerable<PipelineFlowStepResult<T>> stepResults)
         {
             _stepResults.Clear();

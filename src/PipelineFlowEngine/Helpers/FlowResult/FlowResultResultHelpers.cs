@@ -31,22 +31,18 @@ using System.Linq;
 
 namespace RzR.PipelineFlowEngine.Models.Result
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <content>
     ///     Encapsulates the result methods of a flow.
     /// </content>
     /// <seealso cref="RzR.PipelineFlowEngine.Models.Result.FlowResult{T}"/>
-    /// =================================================================================================
     public abstract partial class FlowResult<T> where T : class
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets the flow success data.
         /// </summary>
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         internal FlowResult<T> SetSuccess()
         {
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
@@ -60,7 +56,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets the flow success data.
         /// </summary>
@@ -68,7 +63,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         internal FlowResult<T> SetSuccess(T response)
         {
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
@@ -83,14 +77,12 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets the flow failure data.
         /// </summary>
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         internal FlowResult<T> SetFailure()
         {
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
@@ -104,7 +96,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets the flow failure data.
         /// </summary>
@@ -112,7 +103,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         internal FlowResult<T> SetFailure(string message)
         {
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
@@ -127,16 +117,16 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets the flow result data.
         /// </summary>
         /// <param name="response">The response.</param>
-        /// <param name="status">(Optional) The status. Default value is <see cref="PipelineStatusType.Undefined"/></param>
+        /// <param name="status">
+        ///     (Optional) The status. Default value is <see cref="PipelineStatusType.Undefined"/>
+        /// </param>
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetResult(T response, PipelineStatusType status = PipelineStatusType.Undefined)
         {
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
@@ -151,7 +141,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets a execution flow message.
         /// </summary>
@@ -159,7 +148,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetMessage(string message)
         {
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
@@ -172,7 +160,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets the flow status.
         /// </summary>
@@ -180,7 +167,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetStatus(PipelineStatusType status)
         {
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
@@ -193,7 +179,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets the flow state.
         /// </summary>
@@ -201,7 +186,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetState(PipelineStateType state)
         {
             SetFlowEvent(LogLevel.Information, this.GetType().Name,
@@ -214,14 +198,12 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Query if this object is ok status.
         /// </summary>
         /// <returns>
         ///     True if ok status, false if not.
         /// </returns>
-        /// =================================================================================================
         private bool IsOkStatus()
             => Status == PipelineStatusType.Success
                && Events.Any(x => x.EventLevel == LogLevel.Error || x.EventLevel == LogLevel.Critical).IsFalse();

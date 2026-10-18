@@ -23,42 +23,34 @@ using RzR.PipelineFlowEngine.Models.Result;
 
 namespace RzR.PipelineFlowEngine.Models
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Encapsulates the result of a pipeline flow step.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
-    /// =================================================================================================
     public class PipelineFlowStepResult<T> where T : class
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the name of the step.
         /// </summary>
         /// <value>
         ///     The name of the step.
         /// </value>
-        /// =================================================================================================
         public string StepName { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the step result.
         /// </summary>
         /// <value>
         ///     The step result.
         /// </value>
-        /// =================================================================================================
         public PipeLineStepResult<T> StepResult { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the step iteration.
         /// </summary>
         /// <value>
         ///     The step iteration.
         /// </value>
-        /// =================================================================================================
         public PipelineFlowStepIterationType StepIteration { get; set; }
     }
 }

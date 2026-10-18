@@ -26,14 +26,11 @@ using System;
 
 namespace RzR.PipelineFlowEngine.Extensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An internal type extensions.
     /// </summary>
-    /// =================================================================================================
     internal static class InternalTypeExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A Type extension method that query if 'sourceType' is typeof <see cref="PipeLineResult{T}"/>.
         /// </summary>
@@ -41,11 +38,9 @@ namespace RzR.PipelineFlowEngine.Extensions
         /// <returns>
         ///     True if <see cref="PipeLineResult{T}"/>, false if not.
         /// </returns>
-        /// =================================================================================================
         internal static bool IsPipeLineResult(this Type sourceType)
             => sourceType.Name == typeof(PipeLineResult<>).Name || sourceType.Name == typeof(PipelineFlowInvoker<>).Name;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A Type extension method that query if 'sourceType' is typeof <see cref="PipeLineStepResult{T}"/>
         ///     .
@@ -54,11 +49,9 @@ namespace RzR.PipelineFlowEngine.Extensions
         /// <returns>
         ///     True if <see cref="PipeLineStepResult{T}"/>, false if not.
         /// </returns>
-        /// =================================================================================================
         internal static bool IsPipeLineStepResult(this Type sourceType)
             => sourceType.Name == typeof(PipeLineStepResult<>).Name;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A Type extension method that gets flow name.
         /// </summary>
@@ -66,7 +59,6 @@ namespace RzR.PipelineFlowEngine.Extensions
         /// <returns>
         ///     The flow name.
         /// </returns>
-        /// =================================================================================================
         internal static string GetFlowName(this Type sourceType)
         {
             if (sourceType.IsPipeLineResult())
@@ -77,7 +69,6 @@ namespace RzR.PipelineFlowEngine.Extensions
             return "FLOW";
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A Type extension method that query if 'sourceType' is an instantiable implementation of
         ///     <see cref="IPipelineFlowStep{TPipelineItem}"/>, regardless of how deep in the inheritance
@@ -89,7 +80,6 @@ namespace RzR.PipelineFlowEngine.Extensions
         ///     True if the type can be instantiated and assigned to
         ///     <see cref="IPipelineFlowStep{TPipelineItem}"/>, false if not.
         /// </returns>
-        /// =================================================================================================
         internal static bool IsPipelineFlowStepImplementation<TPipelineItem>(this Type sourceType)
             where TPipelineItem : class
             => sourceType.IsNotNull()

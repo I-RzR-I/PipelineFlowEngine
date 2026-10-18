@@ -16,11 +16,9 @@
 
 namespace RzR.PipelineFlowEngine.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Values that represent pipeline execution command types.
     /// </summary>
-    /// =================================================================================================
     public enum PipelineExecutionCommandType
     {
         /// <summary>

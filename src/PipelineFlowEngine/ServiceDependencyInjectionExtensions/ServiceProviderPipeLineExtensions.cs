@@ -24,14 +24,11 @@ using System;
 
 namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A service provider pipeline extensions.
     /// </summary>
-    /// =================================================================================================
     public static class ServiceProviderPipeLineExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An IServiceProvider extension method that gets pipeline invoker.
         /// </summary>
@@ -40,7 +37,6 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
         /// <returns>
         ///     The pipeline invoker.
         /// </returns>
-        /// =================================================================================================
         public static PipelineFlowInvoker<TPipelineItem> GetPipelineFlowEngineInvoker<TPipelineItem>(
             this IServiceProvider serviceProvider)
             where TPipelineItem : class

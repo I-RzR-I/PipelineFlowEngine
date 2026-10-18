@@ -23,14 +23,11 @@ using System;
 
 namespace RzR.PipelineFlowEngine.Extensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An internal enum extensions.
     /// </summary>
-    /// =================================================================================================
     internal static class InternalEnumExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A T extension method that if is true.
         /// </summary>
@@ -41,7 +38,6 @@ namespace RzR.PipelineFlowEngine.Extensions
         /// <returns>
         ///     A T.
         /// </returns>
-        /// =================================================================================================
         internal static T IfIsTrue<T>(this T sourceEnumValue, T compareEnumValue, T positiveCompareEnumValue)
             where T : Enum
             => sourceEnumValue.AreEquals(compareEnumValue) ? positiveCompareEnumValue : compareEnumValue;
