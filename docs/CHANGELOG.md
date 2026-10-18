@@ -1,3 +1,8 @@
+### **v3.1.0.1132** [[RzR](mailto:108324929+I-RzR-I@users.noreply.github.com)] 18-10-2026
+* [dced8cf] (RzR) -> Auto commit uncommited files
+* [80d6367] (RzR) -> Update the methods summary to use the same pattern.
+* [14dfb0b] (RzR) -> Upgrade the ref packages version.
+
 ### **v3.0.0.5083** [[RzR](mailto:108324929+I-RzR-I@users.noreply.github.com)] 27-08-2026
 * [c9fe057] (RzR) -> Auto commit uncommited files
 * [a86d4d7] (RzR) -> Add regression coverage for v3 invoker behaviour, strip test comments
