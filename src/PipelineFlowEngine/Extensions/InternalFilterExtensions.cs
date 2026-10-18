@@ -25,24 +25,20 @@ using System.Linq;
 
 namespace RzR.PipelineFlowEngine.Extensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An internal filter extensions.
     /// </summary>
-    /// =================================================================================================
     internal static class InternalFilterExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     An IEnumerable&lt;IPipelineFlowStep&lt;T&gt;&gt; extension method that filter collection by `IsEnabled`
-        ///     and order by `ExecutionOrderIndex`.
+        ///     An IEnumerable&lt;IPipelineFlowStep&lt;T&gt;&gt; extension method that filter collection
+        ///     by `IsEnabled` and order by `ExecutionOrderIndex`.
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="steps">The steps to act on.</param>
         /// <returns>
         ///     A list of.
         /// </returns>
-        /// =================================================================================================
         internal static ICollection<IPipelineFlowStep<T>> FilterEnabledOrdered<T>(
             this IEnumerable<IPipelineFlowStep<T>> steps)
             where T : class

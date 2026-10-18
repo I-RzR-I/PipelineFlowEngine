@@ -16,11 +16,9 @@
 
 namespace RzR.PipelineFlowEngine.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Values that represent pipeline status types.
     /// </summary>
-    /// =================================================================================================
     public enum PipelineStatusType
     {
         /// <summary>

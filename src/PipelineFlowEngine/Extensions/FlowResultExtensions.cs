@@ -22,14 +22,11 @@ using RzR.PipelineFlowEngine.Models.Result;
 
 namespace RzR.PipelineFlowEngine.Extensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A flow result extensions.
     /// </summary>
-    /// =================================================================================================
     public static class FlowResultExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     A FlowResult&lt;T&gt; extension method that converts a flowResult to a pipeline step
         ///     result.
@@ -39,21 +36,17 @@ namespace RzR.PipelineFlowEngine.Extensions
         /// <returns>
         ///     A PipeLineStepResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public static PipeLineStepResult<T> AsPipelineStepResult<T>(this FlowResult<T> flowResult) where T : class
             => (PipeLineStepResult<T>)flowResult;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     A FlowResult&lt;T&gt; extension method that converts a flowResult to a pipeline
-        ///     result.
+        ///     A FlowResult&lt;T&gt; extension method that converts a flowResult to a pipeline result.
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="flowResult">The flowResult to act on.</param>
         /// <returns>
         ///     A PipeLineResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public static PipeLineResult<T> AsPipelineResult<T>(this FlowResult<T> flowResult) where T : class
             => (PipeLineResult<T>)flowResult;
     }

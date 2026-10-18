@@ -24,14 +24,11 @@ using RzR.PipelineFlowEngine.Abstractions;
 
 namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A service pipeline dispatch observer extensions.
     /// </summary>
-    /// =================================================================================================
     public static class ServicePipelineDispatchObserverExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An IServiceCollection extension method that registers the observer notified when a fire-
         ///     and-forget dispatched pipeline step reaches a terminal state.
@@ -42,7 +39,6 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
         /// <returns>
         ///     An IServiceCollection.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddPipelineFlowDispatchObserver<TPipelineItem, TObserver>(
             this IServiceCollection serviceCollection)
             where TPipelineItem : class

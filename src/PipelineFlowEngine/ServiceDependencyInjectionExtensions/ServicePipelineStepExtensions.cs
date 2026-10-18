@@ -30,14 +30,11 @@ using System.Collections.Generic;
 
 namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A service pipeline step extensions.
     /// </summary>
-    /// =================================================================================================
     public static class ServicePipelineStepExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An IServiceCollection extension method that adds a step to 'stepLifetime'.
         /// </summary>
@@ -50,7 +47,6 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
         /// <returns>
         ///     An IServiceCollection.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddPipelineFlowEngineStep<TPipelineItem, TPipelineStepImplementation>(
             this IServiceCollection serviceCollection,
             ServiceLifetime stepLifetime = ServiceLifetime.Scoped)
@@ -65,10 +61,12 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
             return serviceCollection;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An IServiceCollection extension method that adds the steps.
         /// </summary>
+        /// <exception cref="ArgumentException">
+        ///     Thrown when one or more arguments have unsupported or illegal values.
+        /// </exception>
         /// <typeparam name="TPipelineItem">Type of the pipeline item.</typeparam>
         /// <param name="serviceCollection">The serviceCollection to act on.</param>
         /// <param name="step">The pipeline step.</param>
@@ -76,7 +74,6 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
         /// <returns>
         ///     An IServiceCollection.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddPipelineFlowEngineStep<TPipelineItem>(
             this IServiceCollection serviceCollection,
             Type step,
@@ -99,10 +96,12 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
             return serviceCollection;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An IServiceCollection extension method that adds the steps.
         /// </summary>
+        /// <exception cref="ArgumentException">
+        ///     Thrown when one or more arguments have unsupported or illegal values.
+        /// </exception>
         /// <typeparam name="TPipelineItem">Type of the pipeline item.</typeparam>
         /// <param name="serviceCollection">The serviceCollection to act on.</param>
         /// <param name="steps">The pipeline steps.</param>
@@ -110,7 +109,6 @@ namespace RzR.PipelineFlowEngine.ServiceDependencyInjectionExtensions
         /// <returns>
         ///     An IServiceCollection.
         /// </returns>
-        /// =================================================================================================
         public static IServiceCollection AddPipelineFlowEngineSteps<TPipelineItem>(
             this IServiceCollection serviceCollection,
             IEnumerable<Type> steps,

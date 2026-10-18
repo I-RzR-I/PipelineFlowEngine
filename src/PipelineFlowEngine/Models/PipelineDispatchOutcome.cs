@@ -24,7 +24,6 @@ using System;
 
 namespace RzR.PipelineFlowEngine.Models
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An immutable description of one completed fire-and-forget dispatched execution. This
     ///     class cannot be inherited.
@@ -32,10 +31,8 @@ namespace RzR.PipelineFlowEngine.Models
     /// <remarks>
     ///     The step is identified by name only.
     /// </remarks>
-    /// =================================================================================================
     public sealed class PipelineDispatchOutcome
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="PipelineDispatchOutcome" /> class.
         /// </summary>
@@ -45,7 +42,6 @@ namespace RzR.PipelineFlowEngine.Models
         ///     (Optional) The exception raised by the dispatched execution, or null when it did not
         ///     fault.
         /// </param>
-        /// =================================================================================================
         public PipelineDispatchOutcome(string stepName, PipelineDispatchStatusType status,
             Exception exception = null)
         {
@@ -55,45 +51,37 @@ namespace RzR.PipelineFlowEngine.Models
             CompletedOnUtc = DateTime.UtcNow;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the runtime type name of the dispatched pipeline step.
         /// </summary>
         /// <value>
         ///     The dispatched step name.
         /// </value>
-        /// =================================================================================================
         public string StepName { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the terminal status of the dispatched execution.
         /// </summary>
         /// <value>
         ///     The dispatch status.
         /// </value>
-        /// =================================================================================================
         public PipelineDispatchStatusType Status { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the exception raised by the dispatched execution.
         /// </summary>
         /// <value>
-        ///     The <see cref="AggregateException"/> reported for the dispatched execution, or null when it
-        ///     did not fault.
+        ///     The <see cref="AggregateException"/> reported for the dispatched execution, or null when
+        ///     it did not fault.
         /// </value>
-        /// =================================================================================================
         public Exception Exception { get; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the moment the outcome was produced.
         /// </summary>
         /// <value>
         ///     The completion date. Always stored in UTC.
         /// </value>
-        /// =================================================================================================
         public DateTime CompletedOnUtc { get; }
     }
 }

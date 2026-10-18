@@ -27,48 +27,38 @@ using RzR.PipelineFlowEngine.Enums;
 
 namespace RzR.PipelineFlowEngine.Models
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     An add pipeline step.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
-    /// =================================================================================================
     public class AddPipelineStep<T> where T : class
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the amount to increment by.
         /// </summary>
         /// <value>
         ///     The amount to increment by.
         /// </value>
-        /// =================================================================================================
         public IPipelineFlowStep<T> Step { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets or sets the step execution strategy.
         /// </summary>
         /// <value>
         ///     The step execution strategy.
         /// </value>
-        /// =================================================================================================
         public PipelineStepExecutionStrategyType StepExecutionStrategy { get; set; }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="AddPipelineStep{T}"/> class.
         /// </summary>
-        /// =================================================================================================
         public AddPipelineStep() { }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="AddPipelineStep{T}"/> class.
         /// </summary>
         /// <param name="step">The amount to increment by.</param>
         /// <param name="stepExecutionStrategy">The step execution strategy.</param>
-        /// =================================================================================================
         public AddPipelineStep(IPipelineFlowStep<T> step, PipelineStepExecutionStrategyType stepExecutionStrategy)
         {
             Step = step;

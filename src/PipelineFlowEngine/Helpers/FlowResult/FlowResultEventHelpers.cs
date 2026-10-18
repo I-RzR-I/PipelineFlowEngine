@@ -26,15 +26,12 @@ using System.Collections.Generic;
 
 namespace RzR.PipelineFlowEngine.Models.Result
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <content>
     ///     Encapsulates the result events of a flow.
     /// </content>
     /// <seealso cref="RzR.PipelineFlowEngine.Models.Result.FlowResult{T}"/>
-    /// =================================================================================================
     public abstract partial class FlowResult<T> where T : class
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets flow event.
         /// </summary>
@@ -42,7 +39,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetFlowEvent(PipelineFlowEvent @event)
         {
             _events.Add(@event);
@@ -50,7 +46,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets flow event.
         /// </summary>
@@ -58,7 +53,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetFlowEvent(IEnumerable<PipelineFlowEvent> events)
         {
             _events.AddRange(events);
@@ -66,7 +60,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets flow event.
         /// </summary>
@@ -76,7 +69,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetFlowEvent(LogLevel level, string flowName, string message)
         {
             _events.Add(new PipelineFlowEvent(level, flowName, message));
@@ -84,7 +76,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets flow event.
         /// </summary>
@@ -95,7 +86,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetFlowEvent(LogLevel level, string flowName, string message, Exception exception)
         {
             _events.Add(new PipelineFlowEvent(level, flowName, message, exception));
@@ -103,7 +93,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
             return this;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets flow event.
         /// </summary>
@@ -113,7 +102,6 @@ namespace RzR.PipelineFlowEngine.Models.Result
         /// <returns>
         ///     A FlowResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public FlowResult<T> SetFlowEvent(LogLevel level, string flowName, Exception exception)
         {
             _events.Add(new PipelineFlowEvent(level, flowName, exception.Message, exception));

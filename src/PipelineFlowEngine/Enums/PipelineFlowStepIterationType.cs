@@ -16,11 +16,9 @@
 
 namespace RzR.PipelineFlowEngine.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Values that represent pipeline flow step iteration types.
     /// </summary>
-    /// =================================================================================================
     public enum PipelineFlowStepIterationType
     {
         /// <summary>

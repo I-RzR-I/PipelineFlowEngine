@@ -22,41 +22,33 @@ using RzR.PipelineFlowEngine.Extensions;
 
 namespace RzR.PipelineFlowEngine.Models.Result
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     Encapsulates the result of a pipeline step. This class cannot be inherited.
     /// </summary>
     /// <typeparam name="T">Generic type parameter.</typeparam>
     /// <seealso cref="T:PipelineFlowEngine.Models.Result.FlowResult{T}"/>
-    /// =================================================================================================
     public sealed class PipeLineStepResult<T> : FlowResult<T> where T : class
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="PipeLineStepResult{T}"/> class.
         /// </summary>
-        /// =================================================================================================
         public PipeLineStepResult() { }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the success.
         /// </summary>
         /// <returns>
         ///     A PipeLineStepResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public static PipeLineStepResult<T> Success()
             => new PipeLineStepResult<T>().SetSuccess().AsPipelineStepResult<T>();
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets the failure.
         /// </summary>
         /// <returns>
         ///     A PipeLineStepResult&lt;T&gt;
         /// </returns>
-        /// =================================================================================================
         public static PipeLineStepResult<T> Failure()
             => new PipeLineStepResult<T>().SetFailure().AsPipelineStepResult<T>();
     }

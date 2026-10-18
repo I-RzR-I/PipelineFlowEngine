@@ -17,13 +17,11 @@
 
 namespace RzR.PipelineFlowEngine.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Values that represent pipeline step pre-validation fail strategy types.
-    ///     The strategy is honored ONLY when the pre-execution validation RETURNS FALSE. A pre-execution
-    ///     validation that THROWS always halts the pipeline, whatever the configured strategy.
+    ///     Values that represent pipeline step pre-validation fail strategy types. The strategy is
+    ///     honored ONLY when the pre-execution validation RETURNS FALSE. A pre-execution validation
+    ///     that THROWS always halts the pipeline, whatever the configured strategy.
     /// </summary>
-    /// =================================================================================================
     public enum PipelineStepPreValidationFailStrategyType
     {
         /// <summary>
